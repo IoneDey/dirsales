@@ -42,6 +42,13 @@
             box-shadow: 0 2px 4px rgba(0, 0, 0, 1);
             margin: 20px 0;
         }
+
+        .input-group-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            /* Adjust gap as needed */
+        }
     </style>
 
     <h2 class="text-center">{{ $title }}</h2>
@@ -203,7 +210,6 @@
                                     <a wire:click="editPaket({{ $dbdatapaket->id }},true)" class="nav-link {{ $timIdAktifPaket == $dbdatapaket->id  ? 'active' : '' }} " aria-current="page" href="#detailbarang">{{ $dbdatapaket->nama }} - H.Jual: {{ number_format($dbdatapaket->hargajual, 0, ',', '.') }}</a>
                                     @endforeach
                                 </nav>
-                                {{ $dbdatapakets->links(data: ['scrollTo' => false]) }}
                             </div>
                         </div>
                     </div>
@@ -228,7 +234,6 @@
                                     <span style="font-size: smaller; color: red;">{{ $message }}</span>
                                     @enderror
                                 </div>
-
                                 <div class="input-group-item" x-data="{ hargaJual: @entangle('hargajual') }">
                                     <span class="input-label">Harga Jual</span>
                                     <input wire:model="hargajual" type="text" inputmode="text" class="form-control" x-model.lazy="hargaJual" x-on:input="formatAngka($event)">
@@ -236,14 +241,32 @@
                                     <span style="font-size: smaller; color: red;">{{ $message }}</span>
                                     @enderror
                                 </div>
-                                <div>
-                                    @if ($isUpdatePaket)
-                                    <button wire:click="updatePaket" type="button" class="btn btn-primary">Update</button>
-                                    @else
-                                    <button wire:click="createTimSetupPaket" type="button" class="btn btn-primary">Simpan</button>
-                                    @endif
-                                    <button wire:click="clearPaket" type="button" class="btn btn-secondary">Bersihkan</button>
+                                <div class="input-group-item">
+                                    <div class="input-group-container">
+                                        <div>
+                                            <span class="input-label">Qty Beli Minimum</span>
+                                            <input wire:model="qtymin" type="number" inputmode="numeric" step="1" pattern="\d*" class="form-control">
+                                            @error('qtymin')
+                                            <span style="font-size: smaller; color: red;">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+                                        <div x-data="{ Disc: @entangle('disc') }>
+                                            <span class=" input-label">Discount (%)</span>
+                                            <input wire:model="disc" type="text" inputmode="text" class="form-control" x-model.lazy="hargaJual" x-on:input="formatAngka($event)">
+                                            @error('disc')
+                                            <span style="font-size: smaller; color: red;">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+                                    </div>
                                 </div>
+                            </div>
+                            <div>
+                                @if ($isUpdatePaket)
+                                <button wire:click="updatePaket" type="button" class="btn btn-primary">Update</button>
+                                @else
+                                <button wire:click="createTimSetupPaket" type="button" class="btn btn-primary">Simpan</button>
+                                @endif
+                                <button wire:click="clearPaket" type="button" class="btn btn-secondary">Bersihkan</button>
                             </div>
 
                             <div class="custom-divider mt-2 mb-3"></div>
@@ -258,7 +281,7 @@
                                 <tbody>
                                     @foreach ($dbdatapakets as $dbdatapaket)
                                     <tr>
-                                        <td>{{ (($dbdatapakets->currentPage()-1)*$dbdatapakets->perPage()) + $loop->iteration }}</td>
+                                        <td>{{ $loop->iteration }}</td>
                                         <td>{{ $dbdatapaket->nama }}</td>
                                         <td class="rata-kanan">{{ number_format($dbdatapaket->hargajual, 0, ',', '.') }}</td>
                                         <td>
@@ -269,7 +292,6 @@
                                     @endforeach
                                 </tbody>
                             </table>
-                            {{ $dbdatapakets->links(data: ['scrollTo' => false]) }}
                         </div>
                     </div>
                 </div>
@@ -354,7 +376,7 @@
                                 <tbody>
                                     @foreach ($dbdatabarangs as $dbdatabarang)
                                     <tr>
-                                        <td>{{ (($dbdatabarangs->currentPage()-1)*$dbdatabarangs->perPage()) + $loop->iteration }}</td>
+                                        <td>{{ $loop->iteration }}</td>
                                         <td>{{ $dbdatabarang->joinBarang->nama }}</td>
                                         <td class="rata-kanan">{{ number_format($dbdatabarang->hpp, 0, ',', '.') }}</td>
                                         <td>

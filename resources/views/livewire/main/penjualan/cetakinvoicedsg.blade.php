@@ -19,38 +19,6 @@
             text-align: center;
         }
 
-        .displaycustom {
-            display: flex;
-            align-items: stretch;
-            justify-content: center;
-            height: auto;
-            width: 95.5%;
-
-            padding: 0;
-            margin-top: 0;
-        }
-
-        .bordercustom {
-            border: 1px solid black;
-            padding: 5px;
-            margin-top: 15px;
-            width: 95%;
-        }
-
-        .logo {
-            width: 90px;
-            height: 60px;
-            margin-top: 1px;
-        }
-
-        .text {
-            text-align: center;
-            font-size: 12px;
-            margin-top: 5px;
-            margin-left: 5px;
-            padding: 0;
-        }
-
         @media print {
             body {
                 width: auto;
@@ -69,12 +37,10 @@
 
         .left {
             flex: 1;
-            /* Menggunakan flex-grow untuk menjaga teks di kiri */
         }
 
         .right {
             flex-shrink: 0;
-            /* Menghindari tanggal untuk menyusut */
         }
 
         /* Table full border */
@@ -104,28 +70,6 @@
             font-weight: bold;
         }
 
-        .note-item {
-            display: flex;
-            align-items: flex-start;
-            margin-bottom: 5px;
-        }
-
-        .note-number {
-            width: 20px;
-            flex-shrink: 0;
-        }
-
-        .note-text {
-            flex-grow: 1;
-            text-align: justify;
-        }
-
-        .nb {
-            font-weight: bold;
-            margin-bottom: 5px;
-            margin-right: 5px;
-        }
-
         .barcode-container {
             display: flex;
             justify-content: center;
@@ -136,26 +80,101 @@
             max-width: 100%;
             height: auto;
         }
+
+        .element-with-border {
+            border-bottom: 7px solid darkred;
+            /* Opsional: untuk memberikan ruang di bawah garis */
+        }
+
+        /* kop */
+        .displaycustom {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            width: 100%;
+            margin-top: 0;
+            background-color: #c0c0c0;
+            padding: 10px;
+        }
+
+        .bordercustom {
+            border: none;
+            padding: 5px;
+            margin-top: 0px;
+            width: 100%;
+        }
+
+        .logo-container {
+            flex-shrink: 0;
+        }
+
+        .logo {
+            width: 90px;
+            height: auto;
+        }
+
+        .content {
+            flex-grow: 1;
+        }
+
+        .text {
+            font-family: Arial, sans-serif;
+            font-size: 8px;
+            line-height: 1.4;
+        }
+
+        .labels {
+            font-family: Arial, sans-serif;
+            font-size: 8px;
+            line-height: 1.4;
+            display: grid;
+            grid-template-columns: auto auto;
+            gap: 0px;
+            align-items: start;
+        }
+
+        .label {
+            font-family: Arial, sans-serif;
+            font-size: 8px;
+            line-height: 1.4;
+        }
+
+        .label-text {
+            margin-left: 0px;
+        }
     </style>
 
-    <div class="container bordercustom">
 
-        <div class="container displaycustom bordercustom">
-            <img src="{{ asset('img/logodinastysinghasarigroup.png') }}" class="logo" alt="Logo Dinasty Setia Media">
-            <div class="text">
-                <b>PT. DINASTY SINGHASARI GROUP</b><br>
-                Jl. Raya Randuagung No.246 Kec. Singosari, Kab. Malang<br>
-                Jawa Timur 65153
+    <div class="container bordercustom">
+        <div class="element-with-border"></div>
+
+        <div class="displaycustom bordercustom">
+            <div class="logo-container">
+                <img src="{{ asset('img/logodinastysinghasarigroup.png') }}" class="logo" alt="DINASTY SINGHASARI GROUP">
+            </div>
+            <div class="content">
+                <div class="text mt-2">
+                    <span>PT. DINASTY SINGHASARI GROUP</span><br>
+                    <span>Kantor : Jl. Raya Randuagung 246</span><br>
+                    <span>Singosari - Malang</span><br>
+                    <span>Jawa Timur - Indonesia</span>
+                </div>
+            </div>
+            <div class="labels mt-2">
+                <div class="label">
+                    <span>Halaman </span>
+                </div>
+                <div class="label-text">
+                    : 1
+                </div>
+                <div class="label">
+                    <span>Tanggal </span>
+                </div>
+                <div class="label-text">
+                    : 22 Jun 2024
+                </div>
             </div>
         </div>
-        <br>
-
-        @if($model=="invoice")
-        <h6 class="header"><b>INVOICE BARANG KELUAR</b></h6>
-        @endif
-        @if($model=="suratjalan")
-        <h6 class="header"><b>SURAT JALAN</b></h6>
-        @endif
 
         <div class="container">
             <div class="customer">
@@ -204,36 +223,33 @@
         </div>
 
         <div class="notes">
-            <div class="note-item">
-                <div class="nb">NB</div>
-                <div class="note-number">1.</div>
-                <div class="note-text">Harap dijaga kondisi barangnya dan dikembalikan setelah digunakan</div>
-            </div>
-            <div class="note-item">
-                <div class="note-number" style="margin-left: 22px">2.</div>
-                <div class="note-text">Kerusakan ditanggung oleh pengguna</div>
-            </div>
+            Faktur Penjualan ini dibuat sesuai dengan perjanjian kedua belah pihak, dan telah disetujui bersama. Faktur ini dibuat
+            untuk dilakukan penagihan sesuai tanggal jatuh tempo dan dianggap lunas ketika sudah dibayar secara tunai atau
+            transaksi ke bank.
         </div>
 
-        <div class="customer">
-            <div class="left">@if($model=="invoice")Dikeluarkan Oleh,@endif @if($model=="suratjalan")Diterima Oleh,@endif</div>
-            <div class="right">@if($model=="invoice")Diterima Oleh,@endif @if($model=="suratjalan")Dikeluarkan Oleh,@endif</div>
-        </div>
         <div class="barcode-container">
             <img id="barcode" src="{{ $qrCodeBase64 }}" />
         </div>
+
         <div class="customer">
+            Tanda Tangan
             <div class="left">
+
                 <u>
                     <pre>                 </pre>
                 </u>
             </div>
+            Tanggal
             <div class="right">
+
                 <u>
-                    <pre>              </pre>
+                    <pre>               </pre>
                 </u>
             </div>
         </div>
+
+        <div class="element-with-border"></div>
     </div>
 
     <script type="text/javascript">

@@ -44,8 +44,12 @@ class Penjualanrekap implements FromCollection, WithHeadings {
             'User',
             'Nama Lock',
             'PJ Admin Nota',
-            'PJ Kolektor Nota',
-            'Status Entry'
+            'PJ Kurir Nota',
+            'Status Entry',
+            'PJ Kurir Asisten',
+            'Tgl Akad',
+            'Foto Akad',
+            'Catatan'
         ];
     }
 

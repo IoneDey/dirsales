@@ -176,8 +176,22 @@ class Validasi extends Component {
     }
 
     public function mount() {
+        // $defaultTglAwal = date('Y-m-01'); // Mengambil tanggal pertama dari bulan ini
+        // $defaultTglAkhir = date('Y-m-t'); // Mengambil tanggal terakhir dari bulan ini
+        // $defaultCari = '';
+
+        // // Mengambil nilai dari session atau menggunakan nilai default jika session kosong
+        // $this->tglAwal = session()->has('tglAwal') ? session('tglAwal') : $defaultTglAwal;
+        // $this->tglAkhir = session()->has('tglAkhir') ? session('tglAkhir') : $defaultTglAkhir;
+        // $this->cari = session()->has('cari') ? session('cari') : $defaultCari;
+
+        // // Menyimpan parameter di session
+        // session()->put('tglAwal', $this->tglAwal);
+        // session()->put('tglAkhir', $this->tglAkhir);
+        // session()->put('cari', $this->cari);
+
         $this->tglAwal = date('Y-m-01'); // Mengambil tanggal pertama dari bulan ini
-        $this->tglAkhir = date('Y-m-t'); // Mengambil tanggal terakhir dari bulan ini
+        $this->tglAkhir  = date('Y-m-t'); // Mengambil tanggal terakhir dari bulan ini
         $this->dbTimsetups = Timsetup::get();
 
         $this->tglAwal = request()->query('tglAwal', $this->tglAwal);

@@ -76,7 +76,7 @@
                                 <span style="font-size: smaller; color: red;">{{ $message }}</span>
                                 @enderror
                                 <input class="form-check-input" wire:model="flagkolektor" type="checkbox" value="false" id="flagdriver" placeholder="" name="flagdriver">
-                                <span class="input-label">Kolektor</span>
+                                <span class="input-label">Kurir</span>
                                 @error('flagkolektor')
                                 <span style="font-size: smaller; color: red;">{{ $message }}</span>
                                 @enderror
@@ -112,7 +112,7 @@
                             <th class="sort @if ($sortColumn=='nama') {{ $sortDirection }} @endif" wire:click="sort('nama')">Nama</th>
                             <th class="sort @if ($sortColumn=='notelp') {{ $sortDirection }} @endif" wire:click="sort('notelp')">No. Telp</th>
                             <th class="rata-tengah sort @if ($sortColumn=='flagdriver') {{ $sortDirection }} @endif" wire:click="sort('flagdriver')">Driver</th>
-                            <th class="rata-tengah sort @if ($sortColumn=='flagkolektor') {{ $sortDirection }} @endif" wire:click="sort('flagkolektor')">Kolektor</th>
+                            <th class="rata-tengah sort @if ($sortColumn=='flagkolektor') {{ $sortDirection }} @endif" wire:click="sort('flagkolektor')">Kurir</th>
                             <th>Act</th>
                         </tr>
                     </thead>

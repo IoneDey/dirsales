@@ -305,7 +305,26 @@
                     <span class="input-label">Total Retur</span>
                     <input wire:model="totalretur" type="text" class="form-control" disabled>
                 </div>
+
+                <div class="input-group-item mb-0">
+                    <span class="input-label" for="inputGroupFoto">Foto Faktur Retur</span>
+                    <input wire:model="foto" accept="image/png, image/jpeg" type="file" class="form-control" id="inputGroupFoto">
+                    <div wire:loading wire:target="foto">Uploading...</div>
+                    @error('foto')
+                    <span style="font-size: smaller; color: red;">{{ $message }}</span>
+                    @enderror
+                    @if (is_string($foto) && strlen($foto) > 0)
+                    <img src="{{ asset('storage/' . $foto) }}" class="img-fluid rounded mx-auto d-block mt-2" alt="...">
+                    @else
+                    @if ($foto)
+                    <img src="{{ $foto->temporaryUrl() }}" class="img-fluid rounded mx-auto d-block mt-2" alt="...">
+                    @endif
+                    @endif
+                </div>
+
             </div>
+
+
             <div>
                 <button wire:click="simpan" type="button" class="btn btn-primary">Simpan</button>
             </div>

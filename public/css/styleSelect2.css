@@ -38,48 +38,23 @@
     line-height: calc(2.25rem + 2px);
 }
 
-
-
-/* ok */
-/* .select2-container .select2-selection--single {
-    height: 100%;
-    box-sizing: border-box;
+/* multiselect */
+.select2-selection--multiple {
+    height: 38px; /* Tinggi yang sama dengan input Bootstrap 5 */
 }
-
-.select2-container--default .select2-selection--single .select2-selection__rendered {
-    height: calc(2.25rem + 2px);
-    border-radius: 0.35rem;
+.select2-container--default .select2-selection--multiple .select2-selection__rendered {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    height: 38px; /* Adjust the height as necessary */
+    align-items: center;
+    margin-top: 17px;
 }
-
-.select2-container--default .select2-selection--single .select2-selection__arrow {
-    height: 100%;
-}
-
-.form-select {
-    width: 100%;
+.select2-container--default .select2-selection--multiple {
     display: flex;
     align-items: center;
+    overflow: hidden;
+    height: 38px; /* Adjust the height as necessary */
 }
-
-.input-group-item {
-    flex: 1 1 300px;
-    display: flex;
-    flex-direction: column;
-}
-
-.input-label {
-    margin-bottom: 1px;
-    font-weight: normal;
-}
-
-.form-control, .form-select {
-    padding: 10px;
-    font-size: 1rem;
-    height: 38px;
-}
-
-@media (max-width: 768px) {
-    .input-group-item {
-        flex: 1 1 100%;
-    }
-} */

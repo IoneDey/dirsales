@@ -52,34 +52,48 @@
                 <span style="font-size: smaller; color: red;">{{ $message }}</span>
                 @enderror
             </div>
-        </div>
+            <div class="col-md-3 col-12 mt-2 mb-1 p-1 g-0 align-items-center">
+                <div class="form-check">
+                    <input wire:model.live="chkFilterSisa" class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                    <label class="form-check-label" for="flexCheckDefault">Tampilkan sisa <= 0</label>
+                </div>
+            </div>
 
-        <div class="table-responsive mb-1">
-            @foreach ($salesData as $tim => $sales)
-            <h5>{{ $tim }}</h5>
-            <table class="table table-sm table-bordered table-striped table-hover" style="width: 100%;">
-                <thead>
-                    <tr>
-                        <th>Nota</th>
-                        <th>Nama Pelanggan</th>
-                        <th>Total Penjualan</th>
-                        <th>Total Penagihan</th>
-                        <th>Sisa</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($sales as $sale)
-                    <tr>
-                        <td>{{ $sale->Nota }}</td>
-                        <td>{{ $sale->Customernama }}</td>
-                        <td class="rata-kanan">{{ number_format(($sale->TotalPenjualan ?? 0), 0, ',', '.') }}</td>
-                        <td class="rata-kanan">{{ number_format(($sale->TotalPenagihan ?? 0), 0, ',', '.') }}</td>
-                        <td class="rata-kanan">{{ number_format(($sale->Sisa ?? 0), 0, ',', '.') }}</td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
-            @endforeach
+            <div class="col-12 mt-1 mb-1">
+                <input class="border rounded" wire:model.live.debounce.500ms="cari" type="text" id="cari" placeholder="cari nota/nama/PJ Kurir/PJ Nota ....">
+            </div>
+            <div class="table-responsive mb-1">
+                @foreach ($salesData as $tim => $sales)
+                <h5>{{ $tim }}</h5>
+                <table class="table table-sm table-bordered table-striped table-hover" style="width: 100%;">
+                    <thead>
+                        <tr>
+                            <th>Nota</th>
+                            <th>Nama Pelanggan</th>
+                            <th>Total Penjualan</th>
+                            <th>Total Retur</th>
+                            <th>Total Penagihan</th>
+                            <th>Sisa</th>
+                            <th>PJ. Kurir Nota</th>
+                            <th>PJ. Admin Nota</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($sales as $sale)
+                        <tr>
+                            <td>{{ $sale->Nota }}</td>
+                            <td>{{ $sale->Customernama }}</td>
+                            <td class="rata-kanan">{{ number_format(($sale->TotalPenjualan ?? 0), 0, ',', '.') }}</td>
+                            <td class="rata-kanan">{{ number_format(($sale->TotalRetur ?? 0), 0, ',', '.') }}</td>
+                            <td class="rata-kanan">{{ number_format(($sale->TotalPenagihan ?? 0), 0, ',', '.') }}</td>
+                            <td class="rata-kanan">{{ number_format(($sale->Sisa ?? 0), 0, ',', '.') }}</td>
+                            <td>{{ $sale->pjkolektornota }}</td>
+                            <td>{{ $sale->pjadminnota }}</td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+                @endforeach
+            </div>
         </div>
     </div>
-</div>

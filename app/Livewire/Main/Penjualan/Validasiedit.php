@@ -34,12 +34,14 @@ class Validasiedit extends Component {
     public $namalock;
     public $namadriver;
     public $pjkolektornota;
+    public $pjkolektorasisten;
     public $pjadminnota;
     public $fotoktp;
     public $fotosuratundian;
     public $fotonota;
     public $fotonotarekap;
     public $catatan = '';
+    public $tglakad;
 
     public $penjualanhdid;
     public $timsetupnama;
@@ -141,12 +143,14 @@ class Validasiedit extends Component {
                 'customernama' => 'required|string|max:150',
                 'customeralamat' => 'required|string|max:255',
                 'customernotelp' => 'required|string|max:20',
-                'shareloc' => 'required|string|max:150',
+                'shareloc' => 'string|max:150',
                 'namasales' => 'required|string|max:150',
                 'namadriver' => 'required|string|max:150',
                 'pjkolektornota' => 'required|string|max:150',
+                'pjkolektorasisten' => 'string|max:150',
                 'pjadminnota' => 'required|string|max:150',
                 'catatan' => 'string|max:255',
+                'tglakad' => 'required|date',
             ];
 
             if ($this->nota != $data->nota) {
@@ -191,25 +195,25 @@ class Validasiedit extends Component {
             $validated = $this->validate($rules);
             if (!is_string($this->fotoktp)) {
                 if ($this->fotoktp) {
-                    $validated['fotoktp'] = $this->fotoktp->storeAs('uploads', 'ktp-' . $this->nota . '.jpg', 'public');
+                    $validated['fotoktp'] = $this->fotoktp->storeAs('uploads', 'ktp-' . $this->nota . $this->timsetupid . '.jpg', 'public');
                 }
             }
 
             if (!is_string($this->fotosuratundian)) {
                 if ($this->fotosuratundian) {
-                    $validated['fotosuratundian'] = $this->fotosuratundian->storeAs('upsurat', 'und-' . $this->nota . '.jpg', 'public');
+                    $validated['fotosuratundian'] = $this->fotosuratundian->storeAs('upsurat', 'und-' . $this->nota . $this->timsetupid . '.jpg', 'public');
                 }
             }
 
             if (!is_string($this->fotonota)) {
                 if ($this->fotonota) {
-                    $validated['fotonota'] = $this->fotonota->storeAs('uploads', 'nota-' . $this->nota . '.jpg', 'public');
+                    $validated['fotonota'] = $this->fotonota->storeAs('uploads', 'nota-' . $this->nota . $this->timsetupid . '.jpg', 'public');
                 }
             }
 
             if (!is_string($this->fotonotarekap)) {
                 if ($this->fotonotarekap) {
-                    $validated['fotonotarekap'] = $this->fotonotarekap->storeAs('uploads', 'notarekap-' . $this->nota . '.jpg', 'public');
+                    $validated['fotonotarekap'] = $this->fotonotarekap->storeAs('uploads', 'notarekap-' . $this->nota . $this->timsetupid . '.jpg', 'public');
                 }
             }
 
@@ -270,12 +274,14 @@ class Validasiedit extends Component {
         $this->namalock = $data->namalock;
         $this->namadriver = $data->namadriver;
         $this->pjkolektornota = $data->pjkolektornota;
+        $this->pjkolektorasisten = $data->pjkolektorasisten;
         $this->pjadminnota = $data->pjadminnota;
         $this->fotoktp = $data->fotoktp;
         $this->fotosuratundian = $data->fotosuratundian;
         $this->fotonota = $data->fotonota;
         $this->fotonotarekap = $data->fotonotarekap;
         $this->catatan = $data->catatan ?? '';
+        $this->tglakad = $data->tglakad;
 
         $this->timsetupnama = $data->joinTimSetup->joinTim->nama;
 

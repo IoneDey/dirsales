@@ -2,11 +2,15 @@
 
 namespace App\Livewire\Main\Penjualan;
 
+use App\Exports\Penjualanreturdetail;
+use App\Models\Penjualanret;
+use App\Models\Penjualanretfoto;
 use App\Models\Timsetup;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Maatwebsite\Excel\Facades\Excel;
 
 class Laporanretur extends Component {
     use WithPagination;
@@ -14,8 +18,17 @@ class Laporanretur extends Component {
     public $title = 'Laporan Retur Penjualan';
     public $tglAwal;
     public $tglAkhir;
-    public $timsetupid = 'Semua';
+    public $timsetupid = [];
+
     public $dbTimsetups;
+    public $gtQty;
+    public $gtJumlah;
+
+
+    public $noretur;
+    public $totalCount;
+
+    public $JenisRpt = 'REKAP';
 
     //--cari + paginate
     public $cari = '';
@@ -27,6 +40,11 @@ class Laporanretur extends Component {
         $this->resetPage();
     }
     //--end cari + paginate
+
+    public function updatedJenisRpt($jenisrpt) {
+        $this->JenisRpt = $jenisrpt;
+        $this->refresh();
+    }
 
     public function mount() {
         $this->tglAwal = date('Y-m-01'); // Mengambil tanggal pertama dari bulan ini
@@ -42,12 +60,95 @@ class Laporanretur extends Component {
         $this->refresh();
     }
 
+    public function confirmDeleteRetur($noretur) {
+        $this->noretur = $noretur;
+        $this->totalCount  = DB::table('penjualanrets as a')
+            ->where('a.noretur', $this->noretur)
+            ->count();
+    }
+
+    public function deleteRetur() {
+        if ($this->totalCount > 0) {
+            $noretur = $this->noretur;
+            DB::transaction(function () use ($noretur) {
+                Penjualanret::where('noretur', $noretur)->delete();
+
+                Penjualanretfoto::where('noretur', $noretur)->delete();
+            }, 5);
+            $this->js('alert("Data retur no: ' . $this->noretur . ' sudah terhapus.")');
+            $this->noretur = null;
+            $this->totalCount = null;
+        }
+    }
+
     public function refresh() {
 
         $startDate = Carbon::parse($this->tglAwal)->format('Y-m-d');
         $endDate = Carbon::parse($this->tglAkhir)->format('Y-m-d');
 
-        $query = DB::table('penjualanrets as a')
+        if ($this->JenisRpt == 'REKAP') {
+            $query = DB::table('penjualanrets as a')
+                ->leftJoin('timsetups as b', 'a.timsetupid', '=', 'b.id')
+                ->leftJoin('tims as c', 'b.timid', '=', 'c.id')
+                ->leftJoin('penjualanhds as d', function ($join) {
+                    $join->on('a.timsetupid', '=', 'd.timsetupid')
+                        ->on('a.nota', '=', 'd.nota');
+                })
+                ->leftJoin('penjualanretfotos as e', function ($join) {
+                    $join->on('a.noretur', '=', 'e.noretur')
+                        ->on('a.userid', '=', 'e.userid');
+                })
+                ->select(
+                    'a.tglretur',
+                    'c.nama as tim',
+                    'a.nota',
+                    'd.customernama',
+                    'a.noretur',
+                    DB::raw('SUM(a.qty * a.harga) as totalretur'),
+                    'e.foto'
+                )
+                ->whereBetween('tglretur', [$startDate, $endDate])
+                ->where(function ($query) {
+                    $query->where('a.nota', 'like', '%' . $this->cari . '%')
+                        ->orWhere('d.customernama', 'like', '%' . $this->cari . '%');
+                })
+                ->groupBy('a.tglretur', 'c.nama', 'a.nota', 'd.customernama', 'a.noretur', 'e.foto');
+        }
+
+        if ($this->JenisRpt == 'DETAIL') {
+            // queryDetail
+            $query = DB::table('penjualanrets as a')
+                ->leftJoin('timsetups as b', 'a.timsetupid', '=', 'b.id')
+                ->leftJoin('tims as c', 'b.timid', '=', 'c.id')
+                ->leftJoin('timsetuppakets as d', 'd.id', '=', 'a.timsetuppaketid')
+                ->leftJoin('timsetupbarangs as e', function ($join) {
+                    $join->on('e.timsetuppaketid', '=', 'a.timsetuppaketid')
+                        ->on('e.barangid', '=', 'a.barangid');
+                })
+                ->leftJoin('barangs as f', 'a.barangid', '=', 'f.id')
+                ->leftJoin('penjualanhds as g', function ($join) {
+                    $join->on('a.timsetupid', '=', 'g.timsetupid')
+                        ->on('a.nota', '=', 'g.nota');
+                })
+                ->select(
+                    'c.nama as tim',
+                    'a.tglretur',
+                    'a.noretur',
+                    'a.nota',
+                    'g.customernama',
+                    'f.nama as namabarang',
+                    'a.qty as qtyretur',
+                    'a.harga as hargaretur',
+                    DB::raw('a.qty * a.harga as totalretur')
+                )
+                ->whereBetween('tglretur', [$startDate, $endDate])
+                ->where(function ($query) {
+                    $query->where('a.nota', 'like', '%' . $this->cari . '%')
+                        ->orWhere('g.customernama', 'like', '%' . $this->cari . '%');
+                });
+        }
+
+        $queryTotal = DB::table('penjualanrets as a')
             ->leftJoin('timsetups as b', 'a.timsetupid', '=', 'b.id')
             ->leftJoin('tims as c', 'b.timid', '=', 'c.id')
             ->leftJoin('penjualanhds as d', function ($join) {
@@ -55,26 +156,75 @@ class Laporanretur extends Component {
                     ->on('a.nota', '=', 'd.nota');
             })
             ->select(
-                'a.tglretur',
-                'c.nama as tim',
-                'a.nota',
-                'd.customernama',
-                'a.noretur',
+                DB::raw('SUM(a.qty) as totalqty'),
                 DB::raw('SUM(a.qty * a.harga) as totalretur')
             )
             ->whereBetween('tglretur', [$startDate, $endDate])
             ->where(function ($query) {
                 $query->where('a.nota', 'like', '%' . $this->cari . '%')
                     ->orWhere('d.customernama', 'like', '%' . $this->cari . '%');
-            })
-            ->groupBy('a.tglretur', 'c.nama', 'a.nota', 'd.customernama', 'a.noretur');
+            });
 
-        if ($this->timsetupid != 'Semua') {
-            $query->where('a.timsetupid', $this->timsetupid);
+        if (is_array($this->timsetupid) && count($this->timsetupid) > 0) {;
+            $query->whereIn('a.timsetupid', $this->timsetupid);
+            $queryTotal->whereIn('a.timsetupid', $this->timsetupid);
+        }
+
+        $dbTotal = $queryTotal->get();
+        if ($dbTotal) {
+            $this->gtQty = $dbTotal[0]->totalqty;
+            $this->gtJumlah = $dbTotal[0]->totalretur;
         }
 
         $dbReturPenjualan = $query->paginate(25);
         return $dbReturPenjualan;
+    }
+
+    public function exportExcel() {
+        $startDate = Carbon::parse($this->tglAwal)->format('Y-m-d');
+        $endDate = Carbon::parse($this->tglAkhir)->format('Y-m-d');
+
+        $query = DB::table('penjualanrets as a')
+            ->leftJoin('timsetups as b', 'a.timsetupid', '=', 'b.id')
+            ->leftJoin('tims as c', 'b.timid', '=', 'c.id')
+            ->leftJoin('timsetuppakets as d', 'd.id', '=', 'a.timsetuppaketid')
+            ->leftJoin('timsetupbarangs as e', function ($join) {
+                $join->on('e.timsetuppaketid', '=', 'a.timsetuppaketid')
+                    ->on('e.barangid', '=', 'a.barangid');
+            })
+            ->leftJoin('barangs as f', 'a.barangid', '=', 'f.id')
+            ->leftJoin('penjualanhds as g', function ($join) {
+                $join->on('a.timsetupid', '=', 'g.timsetupid')
+                    ->on('a.nota', '=', 'g.nota');
+            })
+            ->leftJoin('penjualanretfotos as h', function ($join) {
+                $join->on('a.noretur', '=', 'h.noretur')
+                    ->on('a.userid', '=', 'h.userid');
+            })
+            ->select(
+                'c.nama as tim',
+                'a.created_at as Timestamp',
+                'a.tglretur',
+                'a.nota',
+                'g.customernama',
+                'f.nama as namabarang',
+                'a.qty as qtyretur',
+                'a.harga as hargaretur',
+                DB::raw('a.qty * a.harga as totalretur'),
+                DB::raw("CONCAT('" . asset('storage/') . "/',h.foto) as foto")
+            )
+            ->whereBetween('tglretur', [$startDate, $endDate])
+            ->where(function ($query) {
+                $query->where('a.nota', 'like', '%' . $this->cari . '%')
+                    ->orWhere('g.customernama', 'like', '%' . $this->cari . '%');
+            });
+
+        if (is_array($this->timsetupid) && count($this->timsetupid) > 0) {;
+            $query->whereIn('a.timsetupid', $this->timsetupid);
+        }
+
+        $data = $query->get();
+        return Excel::download(new Penjualanreturdetail($data), 'ReturPenjualanDetail.xlsx');
     }
 
     public function render() {

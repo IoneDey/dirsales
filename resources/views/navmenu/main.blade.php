@@ -17,7 +17,7 @@
                 @endif
 
                 <!-- menu penjualan -->
-                @if (in_array((auth()->user()->roles ?? ''), ['SUPERVISOR','ADMIN 2','LOCK']))
+                @if (in_array((auth()->user()->roles ?? ''), ['SUPERVISOR','SPV ADMIN','ADMIN 2','LOCK','CHECKER']))
                 @php
                 $isActivePenjualan = Request::is('main/penjualan') || Request::is('main/penjualanret') || Request::is('main/penjualanvalidasi') || Request::is('main/penjualanreport') || Request::is('main/returpenjualanreport');
                 @endphp
@@ -29,18 +29,22 @@
                 <!-- menu item penjualan -->
                 <div class="collapse" id="collapseLayoutsPenjualan" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav">
-                        @if (in_array((auth()->user()->roles ?? ''), ['SUPERVISOR','ADMIN 2']))
+                        @if (in_array((auth()->user()->roles ?? ''), ['SUPERVISOR','SPV ADMIN','ADMIN 2']))
                         <a class="{{ Request::is('main/penjualan') ? 'active' : '' }} nav-link" href="{{ route('penjualan') }}">Entry Penjualan</a>
                         <a class="{{ Request::is('main/penjualanret') ? 'active' : '' }} nav-link" href="{{ route('penjualanret') }}">Entry Retur Penjualan</a>
                         @endif
-                        @if (in_array((auth()->user()->roles ?? ''), ['SUPERVISOR','LOCK']))
+                        @if (in_array((auth()->user()->roles ?? ''), ['SUPERVISOR','SPV ADMIN','LOCK']))
                         <a class="{{ Request::is('main/penjualanvalidasi') ? 'active' : '' }} nav-link" href="{{ route('penjualanvalidasi') }}">Validasi Penjualan</a>
                         @endif
+
+                        @if (in_array((auth()->user()->roles ?? ''), ['SUPERVISOR','SPV ADMIN','ADMIN 2','LOCK']))
                         <hr>
-                        @if (in_array((auth()->user()->roles ?? ''), ['SUPERVISOR','ADMIN 2','LOCK']))
+                        @endif
+
+                        @if (in_array((auth()->user()->roles ?? ''), ['SUPERVISOR','SPV ADMIN','ADMIN 2','LOCK','CHECKER']))
                         <a class="{{ Request::is('main/penjualanreport') ? 'active' : '' }} nav-link" href="{{ route('penjualanreport') }}">Laporan Penjualan</a>
                         @endif
-                        @if (in_array((auth()->user()->roles ?? ''), ['SUPERVISOR','ADMIN 2']))
+                        @if (in_array((auth()->user()->roles ?? ''), ['SUPERVISOR','SPV ADMIN','ADMIN 2','CHECKER']))
                         <a class="{{ Request::is('main/returpenjualanreport') ? 'active' : '' }} nav-link" href="{{ route('returpenjualanreport') }}">Laporan Retur Penjualan</a>
                         @endif
                     </nav>
@@ -48,9 +52,9 @@
                 @endif
 
                 <!-- menu penagihan -->
-                @if (in_array((auth()->user()->roles ?? ''), ['SUPERVISOR','PENAGIHAN','ADMIN 2']))
+                @if (in_array((auth()->user()->roles ?? ''), ['SUPERVISOR','PENAGIHAN','SPV ADMIN','ADMIN 2','CHECKER']))
                 @php
-                $isActivePenagihan = Request::is('main/penagihan/*') || Request::is('main/penagihanreport') || Request::is('main/penagihanreportnota') || Request::is('main/penagihanreporttim');
+                $isActivePenagihan = Request::is('main/penagihan/*') || Request::is('main/penagihanreport') || Request::is('main/penagihanreportnota') || Request::is('main/penagihanreporttim') || Request::is('main/penagihanreportperformaangsuran') || Request::is('main/penagihandraftspk') || Request::is('main/penagihanreschedule');
                 @endphp
                 <a class="{{ $isActivePenagihan ? 'active' : '' }} nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayoutsPenagihan" aria-expanded="false" aria-controls="collapseLayoutsPenagihan">
                     <div class="sb-nav-link-icon"><i class="fa-solid fa-file-invoice"></i></div> Penagihan
@@ -60,12 +64,24 @@
                 <!-- menu item penagihan -->
                 <div class="collapse" id="collapseLayoutsPenagihan" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav">
-                        @if (in_array((auth()->user()->roles ?? ''), ['SUPERVISOR','PENAGIHAN','ADMIN 2']))
+                        @if (in_array((auth()->user()->roles ?? ''), ['SUPERVISOR','PENAGIHAN','SPV ADMIN','ADMIN 2']))
                         <a class="{{ Request::is('main/penagihan/*') ? 'active' : '' }} nav-link" href="{{ route('penagihan',['id' => 0]) }}">Entry Penagihan</a>
+                        @endif
+
+                        @if (in_array((auth()->user()->roles ?? ''), ['SUPERVISOR']))
+                        <a class="{{ Request::is('main/penagihanreschedule') ? 'active' : '' }} nav-link" href="{{ route('penagihanreschedule') }}">Reschedule Angsuran</a>
+                        @endif
+
+                        @if (in_array((auth()->user()->roles ?? ''), ['SUPERVISOR','PENAGIHAN','SPV ADMIN','ADMIN 2','CHECKER']))
                         <a class="{{ Request::is('main/penagihanreport') ? 'active' : '' }} nav-link" href="{{ route('penagihanreport') }}">Laporan Penagihan</a>
                         <a class="{{ Request::is('main/penagihanreportnota') ? 'active' : '' }} nav-link" href="{{ route('penagihanreportnota') }}">Laporan Rekap Sisa Penagihan/Nota</a>
+                        <a class="{{ Request::is('main/penagihanreportperformaangsuran') ? 'active' : '' }} nav-link" href="{{ route('penagihanreportperformaangsuran') }}">Laporan Performa Angsuran</a>
                         <a class="{{ Request::is('main/penagihanreporttim') ? 'active' : '' }} nav-link" href="{{ route('penagihanreporttim') }}">Laporan Rekap Penagihan/Tim</a>
                         @endif
+                        @if (in_array((auth()->user()->roles ?? ''), ['SUPERVISOR','PENAGIHAN','SPV ADMIN','CHECKER']))
+                        <a class="{{ Request::is('main/penagihandraftspk') ? 'active' : '' }} nav-link" href="{{ route('draftspk') }}">Draft SPK</a>
+                        @endif
+
                     </nav>
                 </div>
 
@@ -77,7 +93,7 @@
                 @endif
 
                 <!-- menu dashboard -->
-                @if (in_array((auth()->user()->roles ?? ''), ['SUPERVISOR']))
+                @if (in_array((auth()->user()->roles ?? ''), ['SUPERVISOR','SPV ADMIN','CHECKER']))
                 @php
                 $isActiveDashboard = Request::is('main/penjualandashboard');
                 @endphp
@@ -89,7 +105,7 @@
                 <!-- menu item dashboard -->
                 <div class="collapse" id="collapseLayoutsDashboard" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav">
-                        @if (in_array((auth()->user()->roles ?? ''), ['SUPERVISOR']))
+                        @if (in_array((auth()->user()->roles ?? ''), ['SUPERVISOR','SPV ADMIN','CHECKER']))
                         <a class="{{ Request::is('main/penjualandashboard') ? 'active' : '' }} nav-link" href="{{ route('penjualandashboard') }}">Penjualan</a>
                         @endif
                     </nav>

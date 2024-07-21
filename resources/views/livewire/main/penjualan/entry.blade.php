@@ -154,7 +154,7 @@
         </div>
 
         <div class="input-group-item">
-            <span class="input-label">Penanggung jawab Kolektor Nota</span>
+            <span class="input-label">Penanggung jawab Kurir Nota</span>
             <select wire:model="pjkolektornota" type="text" class="form-select">
                 <option value=""></option>
                 @if($dbDrivers)
@@ -167,6 +167,22 @@
             <span style="font-size: smaller; color: red;">{{ $message }}</span>
             @enderror
         </div>
+
+        <div class="input-group-item">
+            <span class="input-label">Penanggung jawab Asisten Kurir</span>
+            <select wire:model="pjkolektorasisten" type="text" class="form-select">
+                <option value=""></option>
+                @if($dbDrivers)
+                @foreach ($dbKolektors as $dbKolektor)
+                <option value="{{ $dbKolektor->nama }}">{{ $dbKolektor->nama }}</option>
+                @endforeach
+                @endif
+            </select>
+            @error('pjkolektorasisten')
+            <span style="font-size: smaller; color: red;">{{ $message }}</span>
+            @enderror
+        </div>
+
 
         <div class="input-group-item">
             <span class="input-label">Penanggung jawab Admin Nota</span>
@@ -227,7 +243,7 @@
             @endif
         </div>
         <div class="input-group-item mb-0">
-            <span class="input-label" for="inputGroupSuratUndian">Foto Surat Undian</span>
+            <span class="input-label" for="inputGroupSuratUndian">Foto Akad Jual Beli</span>
             <input wire:model="fotosuratundian" accept="image/png, image/jpeg" type="file" class="form-control" id="inputGroupSuratUndian">
             @error('fotosuratundian')
             <span style="font-size: smaller; color: red;">{{ $message }}</span>

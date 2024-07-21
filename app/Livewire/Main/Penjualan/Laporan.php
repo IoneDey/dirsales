@@ -9,8 +9,6 @@ use App\Models\Timsetup;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\Request;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Maatwebsite\Excel\Facades\Excel;
@@ -25,7 +23,7 @@ class Laporan extends Component {
     public $status = 'Semua';
     // public $dbPenjualanhds;
     public $nota;
-    public $timsetupid = 'Semua';
+    public $timsetupid = [];
 
     public $dbTimsetups;
 
@@ -259,17 +257,20 @@ class Laporan extends Component {
         $startDate = Carbon::parse($this->tglAwal)->format('Y-m-d');
         $endDate = Carbon::parse($this->tglAkhir)->format('Y-m-d');
 
-        $dbPenjualanhds = Penjualanhd::withSum('joinPenjualandt', DB::raw('jumlah + jumlahkoreksi'))
+        $query = Penjualanhd::withSum('joinPenjualandt', DB::raw('jumlah + jumlahkoreksi'))
             ->whereBetween('tgljual', [$startDate, $endDate])
             ->where(($this->status == 'Semua' ? DB::raw('\'Semua\'') : 'status'), $this->status)
-            ->where(($this->timsetupid == 'Semua' ? DB::raw('\'Semua\'') : 'penjualanhds.timsetupid'), $this->timsetupid)
             ->where(function ($query) {
                 $query->where('penjualanhds.nota', 'like', '%' . $this->cari . '%')
                     ->orWhere('penjualanhds.customernama', 'like', '%' . $this->cari . '%')
                     ->orWhere('penjualanhds.customernotelp', 'like', '%' . $this->cari . '%');
-            })
-            ->paginate(25);
+            });
 
+        if (is_array($this->timsetupid) && count($this->timsetupid) > 0) {;
+            $query->whereIn('penjualanhds.timsetupid', $this->timsetupid);
+        }
+
+        $dbPenjualanhds = $query->paginate(25);
         return $dbPenjualanhds;
     }
 
@@ -293,7 +294,7 @@ class Laporan extends Component {
                     'a.namasales',
                     'a.customeralamat',
                     DB::raw("CONCAT('" . asset('storage/') . "/',a.fotonota) as fotonota"),
-                    'a.fotonotarekap',
+                    DB::raw("CONCAT('" . asset('storage/') . "/',a.fotonotarekap) as fotonotarekap"),
                     DB::raw("'' AS kecamatan"),
                     'g.nama AS kota',
                     'a.angsuranperiode'
@@ -303,8 +304,8 @@ class Laporan extends Component {
                 ->orderBy('a.nota', 'asc');
 
             // Tambahkan klausa where untuk status jika tidak 'Semua'
-            if ($this->timsetupid !== 'Semua') {
-                $query->where('a.timsetupid', $this->timsetupid);
+            if (is_array($this->timsetupid) && count($this->timsetupid) > 0) {;
+                $query->whereIn('a.timsetupid', $this->timsetupid);
             }
 
             if ($this->status !== 'Semua') {
@@ -352,7 +353,11 @@ class Laporan extends Component {
                     'a.namalock',
                     'a.pjadminnota',
                     'a.pjkolektornota',
-                    'a.status'
+                    'a.status',
+                    'a.pjkolektorasisten',
+                    'a.tglakad',
+                    DB::raw("CONCAT('" . asset('storage/') . "/',a.fotosuratundian) as fotosuratundian"),
+                    'a.catatan'
                 )
                 ->leftJoin('penjualandts as b', 'b.penjualanhdid', '=', 'a.id')
                 ->leftJoin('timsetuppakets as c', 'c.id', '=', 'b.timsetuppaketid')
@@ -382,15 +387,19 @@ class Laporan extends Component {
                     'a.pjadminnota',
                     'a.pjkolektornota',
                     'a.timsetupid',
-                    'a.status'
+                    'a.status',
+                    'a.pjkolektorasisten',
+                    'a.tglakad',
+                    'a.fotosuratundian',
+                    'a.catatan'
                 )
                 ->orderBy('i.nama', 'asc')
                 ->orderBy('a.tgljual', 'asc')
                 ->orderBy('a.nota', 'asc');
 
             // Tambahkan klausa where untuk status jika tidak 'Semua'
-            if ($this->timsetupid !== 'Semua') {
-                $query->where('a.timsetupid', $this->timsetupid);
+            if (is_array($this->timsetupid) && count($this->timsetupid) > 0) {;
+                $query->whereIn('a.timsetupid', $this->timsetupid);
             }
 
             if ($this->status !== 'Semua') {
@@ -412,18 +421,22 @@ class Laporan extends Component {
         $penjualanhds = $this->refresh();
         // $this->resetPage();
 
-        $gTotalJual = Penjualanhd::selectRaw('sum((b.jumlah+b.jumlahkoreksi)*c.hargajual) as totaljual')
+        $query = Penjualanhd::selectRaw('sum((b.jumlah+b.jumlahkoreksi)*c.hargajual) as totaljual')
             ->leftJoin('penjualandts as b', 'penjualanhds.id', '=', 'b.penjualanhdid')
             ->leftJoin('timsetuppakets as c', 'c.id', '=', 'b.timsetuppaketid')
             ->whereBetween('tgljual', [$this->tglAwal, $this->tglAkhir])
             ->where(($this->status == 'Semua' ? DB::raw('\'Semua\'') : 'status'), $this->status)
-            ->where(($this->timsetupid == 'Semua' ? DB::raw('\'Semua\'') : 'penjualanhds.timsetupid'), $this->timsetupid)
             ->where(function ($query) {
                 $query->where('penjualanhds.nota', 'like', '%' . $this->cari . '%')
                     ->orWhere('penjualanhds.customernama', 'like', '%' . $this->cari . '%')
                     ->orWhere('penjualanhds.customernotelp', 'like', '%' . $this->cari . '%');
-            })
-            ->first();
+            });
+
+        if (is_array($this->timsetupid) && count($this->timsetupid) > 0) {;
+            $query->whereIn('penjualanhds.timsetupid', $this->timsetupid);
+        }
+        $gTotalJual = $query->first();
+
         return view('livewire.main.penjualan.laporan', [
             'grandTotal' => $gTotalJual,
             'penjualanhds' => $penjualanhds,

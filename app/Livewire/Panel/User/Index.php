@@ -122,11 +122,14 @@ class Index extends Component {
         $rules = ([
             'name' => ['required', 'min:3', 'max:50'],
             'roles' => ['required'],
-            'image' => ['nullable', 'sometimes', 'image', 'max:1024']
         ]);
 
         if ($data->username != $this->username) {
             $rules['username'] = ['required', 'min:3', 'max:15', 'unique:users'];
+        }
+
+        if ($data->image != $this->image) {
+            $rules['username'] = ['nullable', 'sometimes', 'image', 'max:1024'];
         }
 
         if ($data->email != $this->email) {
@@ -138,8 +141,10 @@ class Index extends Component {
         }
 
         $validatedData = $this->validate($rules, $this->messages);
-        if ($this->image) {
-            $validatedData['image'] = $this->image->store('uploads', 'public');
+        if ($data->image != $this->image) {
+            if ($this->image) {
+                $validatedData['image'] = $this->image->store('uploads', 'public');
+            }
         }
 
         if (strlen($this->passwordbaru) >= 5) {

@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
-class Cetakinvoice extends Component {
+class Cetakinvoicedsg extends Component {
     public $title = "Cetak Invoice";
 
     public $model;
@@ -93,7 +93,7 @@ class Cetakinvoice extends Component {
     }
 
     public function render() {
-        return view('livewire.main.penjualan.cetakinvoice', [
+        return view('livewire.main.penjualan.cetakinvoicedsg', [
             'id' => $this->id,
         ])->layout('layouts.nomenu-layout', [
             'title' => $this->title,

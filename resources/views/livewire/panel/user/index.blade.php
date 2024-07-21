@@ -82,6 +82,8 @@
                                 <select wire:model="roles" class="form-control" id="roles" placeholder="roles">
                                     <option value="SUPERVISOR">SUPERVISOR</option>
                                     <option value="MANAGEMENT">MANAGEMENT</option>
+                                    <option value="CHECKER">CHECKER</option>
+                                    <option value="SPV ADMIN">SPV ADMIN</option>
                                     <option value="ADMIN 1">ADMIN 1</option>
                                     <option value="ADMIN 2">ADMIN 2</option>
                                     <option value="LOCK">LOCK</option>

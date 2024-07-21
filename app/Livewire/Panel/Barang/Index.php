@@ -66,11 +66,6 @@ class Index extends Component {
         return response()->streamDownload(function () use ($pdf) {
             echo $pdf->stream();
         }, 'document.pdf');
-
-        // return response($pdf->stream(), 200, [
-        //     'Content-Type' => 'application/pdf',
-        //     'Content-Disposition' => 'inline; filename="document.pdf"'
-        // ]);
     }
 
     public function getDataBarang($id) {
@@ -88,7 +83,7 @@ class Index extends Component {
     public function create() {
         $rules = ([
             'nama' => ['required', 'min:3', 'max:255', 'unique:barangs'],
-            'kode' => ['string', 'min:2', 'max:25'],
+            'kode' => ['min:2', 'max:25'],
         ]);
         $validatedData = $this->validate($rules, $this->messages);
         $validatedData['userid'] = auth()->user()->id;
@@ -108,7 +103,7 @@ class Index extends Component {
             $data = Barang::find($this->tmpId);
 
             $rules = ([
-                'kode' => ['string', 'min:2', 'max:25'],
+                'kode' => ['min:2', 'max:25'],
             ]);
 
             if ($this->nama != $data->nama) {

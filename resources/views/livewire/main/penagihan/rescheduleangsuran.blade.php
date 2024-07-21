@@ -1,5 +1,5 @@
 <div>
-    {{-- The Master doesn't talk, he acts. --}}
+    {{-- Close your eyes. Count to one. That is how long forever feels. --}}
     <script src="{{ asset('js/formatAngka.js') }}"></script>
     @livewireStyles
     <link href="{{ asset('css/style_alert_center_close.css') }}" rel="stylesheet" />
@@ -122,21 +122,8 @@
     </style>
 
     <h2 class="text-center">{{ $title }}</h2>
-    @if ($errors->any())
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        <ul>
-            @foreach ($errors->all() as $error)
-            <pre>{{ $error }}</pre>
-            @endforeach
-        </ul>
-        <button wire:click="resetErrors" type="button" class="btn-close" data-bs-dismiss="alert" aria-label=""></button>
-    </div>
-    @endif
-    <div class="container">
 
-        @if ($isUpdate)
-        <a typ="button" class="badge bg-warning bg-sm mb-2" style="text-decoration: none;" href="{{ route('penagihanreport', ['tglAwal' => request('tglAwal'), 'tglAkhir' => request('tglAkhir'), 'cari' => request('cari'), 'timsetupid' => request('timsetupid')]) }}"><i class="bi bi-arrow-left-circle"></i> Kembali</a>
-        @endif
+    <div class="container">
 
         <div class="row">
             <div class="col-7">
@@ -144,7 +131,7 @@
                     <div class="col-12" style="padding: 1px; position: relative;">
                         <div class="input-group-item" style="position: relative;">
                             <span class="input-label">Nota/Customer</span>
-                            <input {{ ($isUpdate ? "disabled" :"") }} wire:model.live="nota" type="text" class="form-control" id="search-input" placeholder="cari berdasakan nota / nama customer">
+                            <input wire:model.live="nota" type="text" class="form-control" id="search-input" placeholder="cari berdasakan nota / nama customer">
                             @error('nota')
                             <span style="font-size: smaller; color: red;">{{ $message }}</span>
                             @enderror
@@ -195,25 +182,31 @@
                     </div>
 
                     <div class="input-group-item">
-                        <span class="input-label">Tanggal Penagihan/Pengambilan</span>
-                        <input wire:model.live="tglpenagihan" type="date" class="form-control">
-                        @error('tglpenagihan')
+                        <span class="input-label">Tanggal Mulai Angsuran</span>
+                        <input wire:model.live="tglreschedule" type="date" class="form-control">
+                        @error('tglreschedule')
                         <span style="font-size: smaller; color: red;">{{ $message }}</span>
                         @enderror
-
-                        @if ($dbInfoSPK)
-                        <div class="info-box">
-                            <div>F.Y.I:</div>
-                            <div>Angsuran ke: {{ $dbInfoSPK->angsuranke }}</div>
-                            <div>Nilai Angsuran: {{ number_format(($dbInfoSPK->perangsuran ?? 0), 0, ',', '.') }}</div>
-                            <div>Penagihan A{{ $dbInfoSPK->angsuranke }}: {{ number_format(($dbInfoSPK->jmlpenagihan ?? 0), 0, ',', '.') }}</div>
-                        </div>
-                        @endif
                     </div>
 
                     <div class="input-group-item">
-                        <span class="input-label">Yang Menagih</span>
-                        <select wire:model="namapenagih" type="text" class="form-select">
+                        <span class="input-label">Angsuran - Hari</span>
+                        <input wire:model="angsuranhari" type="number" class="form-control">
+                        @error('angsuranhari')
+                        <span style="font-size: smaller; color: red;">{{ $message }}</span>
+                        @enderror
+                    </div>
+                    <div class="input-group-item">
+                        <span class="input-label">Angsuran - Periode</span>
+                        <input wire:model="angsuranperiode" type="number" class="form-control">
+                        @error('angsuranperiode')
+                        <span style="font-size: smaller; color: red;">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <div class="input-group-item">
+                        <span class="input-label">Kurir</span>
+                        <select wire:model="kurir" type="text" class="form-select">
                             <option value=""></option>
                             @if($dbKolektors)
                             @foreach ($dbKolektors as $dbKolektor)
@@ -221,109 +214,26 @@
                             @endforeach
                             @endif
                         </select>
-                        @error('namapenagih')
+                        @error('kurir')
                         <span style="font-size: smaller; color: red;">{{ $message }}</span>
                         @enderror
                     </div>
 
-                    <div class="input-group-item" x-data="{ Jumlahbayar: @entangle('jumlahbayar') }">
-                        <span class="input-label">Jumlah Pembayaran
-                        </span>
-                        <input wire:model.live="jumlahbayar" type="text" inputmode="text" class="form-control text-right" x-model="Jumlahbayar" x-on:input="formatAngka($event)">
-                        @error('jumlahbayar')
+                    <div class="input-group-item" x-data="{ Item: @entangle('penjualan') }">
+                        <span class="input-label">Sisa Tagihan</span>
+                        <input disabled wire:model.live="penjualan" type="text" inputmode="text" class="form-control text-right" x-model="Item" x-on:input="formatAngka($event)">
+                        @error('penjualan')
                         <span style="font-size: smaller; color: red;">{{ $message }}</span>
                         @enderror
                     </div>
-
-                    <div class="input-group-item" x-data="{ Biayaadmin: @entangle('biayaadmin')}">
-                        <span class="input-label">Biaya Admin/ongkos koordinator</span>
-                        <input wire:model.live="biayaadmin" type="text" inputmode="text" class="form-control text-right" x-model="Biayaadmin" x-on:input="formatAngka($event)">
-                        @error('biayaadmin')
-                        <span style="font-size: smaller; color: red;">{{ $message }}</span>
-                        @enderror
-                    </div>
-
-                    <div class="input-group-item" x-data="{ Biayakomisi: @entangle('biayakomisi')}">
-                        <span class="input-label">Potongan Komisi Penagihan Warga</span>
-                        <input wire:model.live="biayakomisi" type="text" inputmode="text" class="form-control text-right" x-model="Biayakomisi" x-bind:disabled="isDisabled" x-on:input="formatAngka($event)" {{ (($angsuranperiode ?? 0) == ($dbInfoSPK->angsuranke ?? 0) || ($tglpenagihan >= $tglAngsuranAkhir)) ? '' : 'disabled' }}>
-                        @error('biayakomisi')
-                        <span style="font-size: smaller; color: red;">{{ $message }}</span>
-                        @enderror
-                    </div>
-
-                    <div class="input-group-item" x-data="{ Jumlah: @entangle('jumlah') }">
-                        <span class="input-label">Jumlah Total</span>
-                        <input wire:model="jumlah" type="text" inputmode="text" class="form-control text-right" x-model="Jumlah" x-on:input="formatAngka($event)" disabled>
-                        @error('jumlah')
-                        <span style="font-size: smaller; color: red;">{{ $message }}</span>
-                        @enderror
-                    </div>
-
-                    <div class="input-group-item mb-0">
-                        <span class="input-label" for="inputKwitans">Foto Kwitansi</span>
-                        <input wire:model="fotokwitansi" accept="image/png, image/jpeg" type="file" class="form-control" id="inputKwitans">
-                        <div wire:loading wire:target="fotokwitansi">Uploading...</div>
-                        @error('fotokwitansi')
-                        <span style="font-size: smaller; color: red;">{{ $message }}</span>
-                        @enderror
-                        @if (is_string($fotokwitansi) && strlen($fotokwitansi) > 0)
-                        <img src="{{ asset('storage/' . $fotokwitansi) }}" class="img-fluid rounded mx-auto d-block mt-2" style="transform: rotate({{ $rotation }}deg);" alt="...">
-                        @else
-                        @if ($fotokwitansi)
-                        <img src="{{ $fotokwitansi->temporaryUrl() }}" class="img-fluid rounded mx-auto d-block mt-2" style="transform: rotate({{ $rotation }}deg);" alt="...">
-                        @endif
-                        @endif
-                        @if ($fotokwitansi)
-                        <button wire:click="rotate">Rotate</button>
-                        @endif
-                    </div>
-
-                    <div class="input-group-item">
-                        <span class="input-label">Kategori</span>
-                        <select wire:model="kategori" type="text" class="form-control">
-                            <option value="Belum Terkunjungi">❌Belum Terkunjungi</option>
-                            <option value="Penundaan pembayaran">❌Penundaan pembayaran</option>
-                            <option value="Penjadwalan pengambilan retur">❌Penjadwalan pengambilan retur</option>
-                            <option value="Salah Presepsi Jumlah angsuran">❌Salah Presepsi Jumlah angsuran</option>
-                            <option value="Penagihan tidak lengkap terkonfirmasi">✅Penagihan tidak lengkap terkonfirmasi</option>
-                            <option value="Penagihan lengkap terkonfirmasi">✅Penagihan lengkap terkonfirmasi</option>
-                            <option value="Kunjungan diluar SPK">✅Kunjungan diluar SPK</option>
-                            <option value="Kunjungan Ulang">🔁Kunjungan Ulang</option>
-                        </select>
-                        @error('kategori')
-                        <span style="font-size: smaller; color: red;">{{ $message }}</span>
-                        @enderror
-                    </div>
-
-                    <div class="input-group-item">
-                        <span class="input-label">Catatan</span>
-                        <div class="notes-section">
-                            <div class="star-rating">
-                                @for ($i = 1; $i <= 5; $i++) <span style="cursor: pointer; font-size: 1em; color: {{ $hoverRating >= $i || $rating >= $i ? 'gold' : 'gray' }};" wire:click="setRating({{ $i }})" wire:mouseover="setHoverRating({{ $i }})" wire:mouseout="resetHoverRating">
-                                    ★
-                                    </span>
-                                    @endfor
-                                    @if($hoverRating > 0)
-                                    <div class="note" style="margin-top: 1px;">
-                                        {{ $notes[$hoverRating] }}
-                                    </div>
-                                    @endif
-                            </div>
-                        </div>
-                        <input wire:model="catatan" type="text" class="form-control">
-                    </div>
-
                 </div>
+
                 <div>
-                    @if ($isUpdate)
-                    <button wire:click="update" type="button" class="btn btn-primary mt-1">Update</button>
-                    @else
-                    <button wire:click="create" type="button" class="btn btn-primary mt-1">Simpan</button>
-                    @endif
-                    @if (!$isUpdate)
+
+                    <button {{ $penjualan==0 ? 'disabled':'' }} wire:click="create" type="button" class="btn btn-primary mt-1">Simpan</button>
                     <button wire:click="clear" type="button" class="btn btn-secondary mt-1">Bersihkan</button>
-                    @endif
                 </div>
+
             </div>
 
             <div class="col-5">
@@ -360,30 +270,6 @@
 
                 <!-- info angsuran -->
                 <div class="table-responsive input-group">
-                    <!-- <div class="input-group-item form-check-inline">
-                        <span class="input-label">Metode Reschedule Angsuran</span>
-                        <div class="input-group">
-                            <div class="form-check">
-                                <input value="Avg" wire:model.live="selectedOption" class="form-check-input" type="radio" name="opt1" id="opt1">
-                                <label class="form-check-label" for="opt1">
-                                    Avg
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <input value="Up" wire:model.live="selectedOption" class="form-check-input" type="radio" name="opt2" id="opt2">
-                                <label class="form-check-label" for="opt2">
-                                    Up
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <input value="Down" wire:model.live="selectedOption" class="form-check-input" type="radio" name="opt3" id="opt3">
-                                <label class="form-check-label" for="opt3">
-                                    Down
-                                </label>
-                            </div>
-                        </div>
-                    </div> -->
-
                     <div class="input-group-item">
                         <div>Informasi Angsuran</div>
                         <div>Tgl Penjualan: {{ $tgljual }} - Rp. {{ number_format(($jmljual ?? 0), 0, ',', '.') }}</div>
@@ -417,11 +303,6 @@
             </div>
 
         </div>
-
-        @if ($isUpdate)
-        <a typ="button" class="badge bg-warning bg-sm mt-3" style="text-decoration: none;" href="{{ route('penagihanreport', ['tglAwal' => request('tglAwal'), 'tglAkhir' => request('tglAkhir'), 'cari' => request('cari'), 'timsetupid' => request('timsetupid')]) }}"><i class="bi bi-arrow-left-circle"></i> Kembali</a>
-        @endif
-
-
     </div>
+
 </div>

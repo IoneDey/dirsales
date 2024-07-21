@@ -111,8 +111,12 @@
             <div class="col-md-3 col-12 mb-1 p-1 g-0">
                 <div class="d-flex align-items-left" x-data="{ isUpdate: @entangle('isUpdate') }" wire:ignore>
                     <span class="me-0 input-group-text" style="padding: 0.375rem 0.5rem; border-radius: 0.25rem 0 0 0; margin-right: -0.5rem; height: 38px;">Tim</span>
-                    <select x-data="{item: @entangle('timsetupid')}" x-init="$($refs.select2ref).select2(); $($refs.select2ref).on('change', function(){$wire.set('timsetupid', $(this).val());});" x-effect="$refs.select2ref.value = item; $($refs.select2ref).select2();" x-ref="select2ref" :disabled="isUpdate" class="form-select" aria-label="Tim">
-                        <option value='Semua'>Semua</option>
+                    <select multiple="multiple" x-data="{item: @entangle('timsetupid')}" x-init="
+                $($refs.select2ref).select2({ closeOnSelect: false });
+                $($refs.select2ref).on('change', function() {
+                    $wire.set('timsetupid', $(this).val());
+                });
+                " x-effect="$($refs.select2ref).val(item).trigger('change')" x-ref="select2ref" :disabled="isUpdate" class="form-select" aria-label="Tim">
                         @foreach ($dbTimsetups as $dbTimsetup)
                         <option value="{{ $dbTimsetup->id }}">{{ $dbTimsetup->joinTim->nama }}</option>
                         @endforeach
@@ -165,7 +169,7 @@
                         <th>Nama Sales</th>
                         <th>Nama Lock</th>
                         <th>Nama Driver</th>
-                        <th>PJ Kolektor Nota</th>
+                        <th>PJ Kurir Nota</th>
                         <th>PJ Admin Nota</th>
                         <th class="rata-kanan">Tot Jumlah</th>
                         <th>Barang</th>
@@ -183,7 +187,10 @@
                     @foreach ($penjualanhds as $penjualanhd)
                     <tr>
                         @if ((auth()->user()->roles ?? '')== 'SUPERVISOR')
-                        <td class="rata-tengah"><a href="cetakinvoice/{{ $penjualanhd->id }}" target="_blank" type="button" class="badge bg-info bg-sm" title="Cetak Invoice"><i class="bi bi-printer-fill"></i></a></td>
+                        <td class="rata-tengah">
+                            <a href="cetakinvoice/{{ $penjualanhd->id }}/{{ 'suratjalan' }}" target="_blank" type="button" class="badge bg-info bg-sm" title="Cetak Surat Jalan"><i class="bi bi-card-text"></i></a>
+                            <a href="cetakinvoice/{{ $penjualanhd->id }}/{{ 'invoice' }}" target="_blank" type="button" class="badge bg-info bg-sm" title="Cetak Invoice"><i class="bi bi-printer-fill"></i></a>
+                        </td>
                         @endif
                         @if ((auth()->user()->roles ?? '')== 'SUPERVISOR')
                         <td class="rata-tengah">
@@ -248,6 +255,7 @@
                         <td></td>
                         <td></td>
                         <td></td>
+                        <td></td>
                         <td class="rata-kanan">Grand Total</td>
                         <td class="rata-kanan">{{ number_format(($grandTotal->totaljual ?? 0), 0, ',', '.') }}</td>
                         <td></td>
@@ -266,7 +274,7 @@
         {{ $penjualanhds->links() }}
     </div>
 
-    @if ((auth()->user()->roles ?? '')== 'SUPERVISOR')
+    @if (in_array(auth()->user()->roles ?? '', ['SUPERVISOR', 'SPV ADMIN']))
     <div class="container">
         <div class="col-md-4 col-12 mb-1 p-1 g-0">
             <div class="input-group">

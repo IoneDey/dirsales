@@ -16,7 +16,7 @@ class Laporan extends Component {
     public $title = 'Laporan Penagihan';
     public $tglAwal;
     public $tglAkhir;
-    public $timsetupid = 'Semua';
+    public $timsetupid = [];
     public $dbTimsetups;
 
     //--cari + paginate
@@ -30,10 +30,22 @@ class Laporan extends Component {
     }
     //--end cari + paginate
 
+    protected $queryString = [
+        'tglAwal' => ['except' => ''],
+        'tglAkhir' => ['except' => ''],
+        'cari' => ['except' => ''],
+        'timsetupid' => ['except' => '']
+    ];
+
     public function mount() {
         $this->tglAwal = date('Y-m-01'); // Mengambil tanggal pertama dari bulan ini
         $this->tglAkhir = date('Y-m-t'); // Mengambil tanggal terakhir dari bulan ini
         $this->dbTimsetups = Timsetup::get();
+
+        $this->tglAwal = request()->query('tglAwal', $this->tglAwal);
+        $this->tglAkhir = request()->query('tglAkhir', $this->tglAkhir);
+        $this->cari = request()->query('cari', $this->cari);
+        $this->timsetupid = request()->query('timsetupid', $this->cari);
     }
 
     public function updatedtglAwal() {
@@ -79,8 +91,8 @@ class Laporan extends Component {
                     ->orWhere('b.customernama', 'like', '%' . $this->cari . '%');
             });
 
-        if ($this->timsetupid != 'Semua') {
-            $query->where('a.timsetupid', $this->timsetupid);
+        if (is_array($this->timsetupid) && count($this->timsetupid) > 0) {;
+            $query->whereIn('a.timsetupid', $this->timsetupid);
         }
 
         $dbPenagihans = $query->paginate(25);
@@ -98,6 +110,7 @@ class Laporan extends Component {
             })
             ->leftJoin('timsetups as c', 'b.timsetupid', '=', 'c.id')
             ->leftJoin('tims as d', 'c.timid', '=', 'd.id')
+            ->leftJoin('users as e', 'a.userid', '=', 'e.id')
             ->select(
                 'd.nama as tim',
                 'a.created_at',
@@ -109,14 +122,18 @@ class Laporan extends Component {
                 'a.jumlahbayar',
                 'a.biayakomisi',
                 'a.biayaadmin',
-                DB::raw('a.jumlahbayar + a.biayakomisi + a.biayaadmin as total')
+                DB::raw('a.jumlahbayar + a.biayakomisi + a.biayaadmin as total'),
+                'e.name as userentry',
+                'a.catatan',
+                'a.rating',
+                'a.kategori'
             )
             ->whereBetween('tglpenagihan', [$startDate, $endDate])
             ->orderBy('d.nama', 'asc')
             ->orderBy('a.tglpenagihan', 'asc');
 
-        if ($this->timsetupid != 'Semua') {
-            $query->where('a.timsetupid', $this->timsetupid);
+        if (is_array($this->timsetupid) && count($this->timsetupid) > 0) {;
+            $query->whereIn('a.timsetupid', $this->timsetupid);
         }
 
         $data = $query->get();
@@ -143,9 +160,12 @@ class Laporan extends Component {
                 $query->where('a.nota', 'like', '%' . $this->cari . '%')
                     ->orWhere('b.customernama', 'like', '%' . $this->cari . '%');
             });
-        if ($this->timsetupid != 'Semua') {
-            $penagihantTotal->where('a.timsetupid', $this->timsetupid);
+
+        if (is_array($this->timsetupid) && count($this->timsetupid) > 0) {;
+            $penagihantTotal->whereIn('a.timsetupid', $this->timsetupid);
         }
+
+
 
         return view('livewire.main.penagihan.laporan', [
             'penagihans' => $penagihans,

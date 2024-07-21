@@ -124,7 +124,7 @@
                 <table class="table table-sm table-bordered table-striped table-hover" style="width: 100%;">
                     <thead>
                         <tr>
-                            @if ((auth()->user()->roles ?? '')== 'SUPERVISOR')
+                            @if (in_array(auth()->user()->roles ?? '', ['SUPERVISOR', 'SPV ADMIN']))
                             <th>Act</th>
                             @endif
                             <th>Tim</th>
@@ -139,7 +139,7 @@
                             <th>Nama Sales</th>
                             <th>Nama Lock</th>
                             <th>Nama Driver</th>
-                            <th>PJ Kolektor Nota</th>
+                            <th>PJ Kurir Nota</th>
                             <th>PJ Admin Nota</th>
                             <th class="rata-kanan">Tot Jumlah</th>
                             <th>Barang</th>
@@ -155,7 +155,7 @@
                     <tbody>
                         @foreach ($penjualanhds as $penjualanhd)
                         <tr>
-                            @if ((auth()->user()->roles ?? '')== 'SUPERVISOR')
+                            @if (in_array(auth()->user()->roles ?? '', ['SUPERVISOR', 'SPV ADMIN']))
                             <td>
                                 <a type="button" class="badge bg-warning bg-sm" href="{{ route('penjualanvalidasiedit', ['id' => $penjualanhd->id, 'tglAwal' => $tglAwal, 'tglAkhir' => $tglAkhir, 'cari' => $cari]) }}" title="Edit">
                                     <i class="bi bi-pencil-fill"></i>
@@ -220,8 +220,10 @@
                             <td></td>
                             <td></td>
                             <td></td>
+                            <td></td>
                             <td class="rata-kanan">Grand Total</td>
                             <td class="rata-kanan">{{ number_format(($grandTotal->totaljual ?? 0), 0, ',', '.') }}</td>
+                            <td></td>
                             <td></td>
                             <td></td>
                             <td></td>

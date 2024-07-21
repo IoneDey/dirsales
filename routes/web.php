@@ -30,37 +30,58 @@ Route::middleware(['checkroles:SUPERVISOR'])->group(function () {
 });
 
 // entry penjualan dan retur
-Route::middleware(['checkroles:SUPERVISOR,ADMIN 1,ADMIN 2'])->group(function () {
+Route::middleware(['checkroles:SUPERVISOR,SPV ADMIN,ADMIN 2'])->group(function () {
     Route::get('/main/penjualan', App\Livewire\Main\Penjualan\Index::class)->name('penjualan');
     Route::get('/main/penjualanret', App\Livewire\Main\Penjualan\Retur::class)->name('penjualanret');
 });
 
 // penjualan validasi
-Route::middleware(['checkroles:SUPERVISOR,ADMIN 1,LOCK'])->group(function () {
+Route::middleware(['checkroles:SUPERVISOR,SPV ADMIN,LOCK'])->group(function () {
     Route::get('/main/penjualanvalidasi', App\Livewire\Main\Penjualan\Validasi::class)->name('penjualanvalidasi');
     Route::get('/main/penjualanvalidasiedit/{id}', App\Livewire\Main\Penjualan\Validasiedit::class)->name('penjualanvalidasiedit');
 });
 
 // laporan penjualan
-Route::middleware(['checkroles:SUPERVISOR,ADMIN 1,ADMIN 2,LOCK'])->group(function () {
+Route::middleware(['checkroles:SUPERVISOR,SPV ADMIN,ADMIN 2,LOCK,CHECKER'])->group(function () {
     Route::get('/main/penjualanreport', App\Livewire\Main\Penjualan\Laporan::class)->name('penjualanreport');
+});
+// cetak invoice
+Route::middleware(['checkroles:SUPERVISOR'])->group(function () {
+    Route::get('/main/cetakinvoice/{id}/{model}', App\Livewire\Main\Penjualan\Cetakinvoice::class)->name('cetakinvoice');
+    Route::get('/main/cetakinvoicedsg/{id}/{model}', App\Livewire\Main\Penjualan\Cetakinvoicedsg::class)->name('cetakinvoicedsg');
 });
 
 // laporan retur penjualan
-Route::middleware(['checkroles:SUPERVISOR,ADMIN 1,ADMIN 2'])->group(function () {
+Route::middleware(['checkroles:SUPERVISOR,SPV ADMIN,ADMIN 2,CHECKER'])->group(function () {
     Route::get('/main/returpenjualanreport', App\Livewire\Main\Penjualan\Laporanretur::class)->name('returpenjualanreport');
 });
 
+
 // penagihan
-Route::middleware(['checkroles:SUPERVISOR,PENAGIHAN,ADMIN 2'])->group(function () {
+Route::middleware(['checkroles:SUPERVISOR,PENAGIHAN,SPV ADMIN,ADMIN 2'])->group(function () {
     Route::get('/main/penagihan/{id}', App\Livewire\Main\Penagihan\index::class)->name('penagihan');
+});
+
+// penagihan reschedule angsuran
+Route::middleware(['checkroles:SUPERVISOR'])->group(function () {
+    Route::get('/main/penagihanreschedule', App\Livewire\Main\Penagihan\Rescheduleangsuran::class)->name('penagihanreschedule');
+});
+
+// draft spk
+Route::middleware(['checkroles:SUPERVISOR,PENAGIHAN,SPV ADMIN,CHECKER'])->group(function () {
+    Route::get('/main/penagihandraftspk', App\Livewire\Main\Penagihan\draftspk::class)->name('draftspk');
+});
+
+// laporan penagihan
+Route::middleware(['checkroles:SUPERVISOR,PENAGIHAN,SPV ADMIN,ADMIN 2,CHECKER'])->group(function () {
     Route::get('/main/penagihanreport', App\Livewire\Main\Penagihan\laporan::class)->name('penagihanreport');
     Route::get('/main/penagihanreportnota', App\Livewire\Main\Penagihan\laporanpenagihannota::class)->name('penagihanreportnota');
+    Route::get('/main/penagihanreportperformaangsuran', App\Livewire\Main\Penagihan\laporanperformaangsuran::class)->name('penagihanreportperformaangsuran');
     Route::get('/main/penagihanreporttim', App\Livewire\Main\Penagihan\laporanpenagihantim::class)->name('penagihanreporttim');
 });
 
 // dashboard
-Route::middleware(['checkroles:SUPERVISOR'])->group(function () {
+Route::middleware(['checkroles:SUPERVISOR,SPV ADMIN,CHECKER'])->group(function () {
     Route::get('/main/penjualandashboard', App\Livewire\Main\Dashboard\penjualan::class)->name('penjualandashboard');
 });
 
@@ -71,5 +92,3 @@ route::middleware('auth')->group(function () {
 
 Route::get('/login', App\Livewire\Login::class)->name('login')->middleware('guest');
 Route::get('/', App\Livewire\Main\Index::class)->name('main');
-
-Route::get('/main/cetakinvoice/{id}', Cetakinvoice::class)->name('cetakinvoice');

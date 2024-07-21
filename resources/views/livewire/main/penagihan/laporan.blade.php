@@ -72,8 +72,12 @@
             <div class="col-md-3 col-12 mb-1 p-1 g-0">
                 <div class="d-flex align-items-left" x-data="{ isUpdate: @entangle('isUpdate') }" wire:ignore>
                     <span class="me-0 input-group-text" style="padding: 0.375rem 0.5rem; border-radius: 0.25rem 0 0 0; margin-right: -0.5rem; height: 38px;">Tim</span>
-                    <select x-data="{item: @entangle('timsetupid')}" x-init="$($refs.select2ref).select2(); $($refs.select2ref).on('change', function(){$wire.set('timsetupid', $(this).val());});" x-effect="$refs.select2ref.value = item; $($refs.select2ref).select2();" x-ref="select2ref" :disabled="isUpdate" class="form-select" aria-label="Tim">
-                        <option value='Semua'>Semua</option>
+                    <select multiple="multiple" x-data="{item: @entangle('timsetupid')}" x-init="
+                        $($refs.select2ref).select2({ closeOnSelect: false });
+                        $($refs.select2ref).on('change', function() {
+                        $wire.set('timsetupid', $(this).val());
+                        });
+                        " x-effect="$($refs.select2ref).val(item).trigger('change')" x-ref="select2ref" :disabled="isUpdate" class="form-select" aria-label="Tim">
                         @foreach ($dbTimsetups as $dbTimsetup)
                         <option value="{{ $dbTimsetup->id }}">{{ $dbTimsetup->joinTim->nama }}</option>
                         @endforeach
@@ -125,7 +129,7 @@
                         <td>{{ $penagihan->name }}</td>
                         <td>
                             @if ((auth()->user()->roles ?? '')== 'SUPERVISOR')
-                            <a type="button" class="badge bg-warning bg-sm" href="{{ route('penagihan',['id' => $penagihan->id]) }}" title="Edit">
+                            <a type="button" class="badge bg-warning bg-sm" href="{{ route('penagihan', ['id' => $penagihan->id, 'tglAwal' => $tglAwal, 'tglAkhir' => $tglAkhir, 'cari' => $cari, 'timsetupid' => $timsetupid]) }}" title="Edit">
                                 <i class="bi bi-pencil-fill"></i>
                             </a>
                             @endif
@@ -150,14 +154,16 @@
                     </tr>
                 </tfoot>
             </table>
-
         </div>
         {{ $penagihans->links() }}
 
-        <button wire:click="exportExcel" wire:loading.attr="disabled" class="badge bg-success bg-sm d-flex justify-content-center align-items-center custom-hover mt-2" type="button" title="Export Excel"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-spreadsheet" viewBox="0 0 16 16">
+        @if (in_array(auth()->user()->roles ?? '', ['SUPERVISOR', 'SPV ADMIN']))
+        <button wire:click="exportExcel" wire:loading.attr="disabled" class="badge bg-success bg-sm d-flex justify-content-center align-items-center custom-hover mt-2" type="button" title="Export Excel">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-spreadsheet" viewBox="0 0 16 16">
                 <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 3A1.5 1.5 0 0 0 11 4.5h2V9H3V2a1 1 0 0 1 1-1h5.5zM3 12v-2h2v2zm0 1h2v2H4a1 1 0 0 1-1-1zm3 2v-2h3v2zm4 0v-2h3v1a1 1 0 0 1-1 1zm3-3h-3v-2h3zm-7 0v-2h3v2z" />
-            </svg></button>
-
+            </svg>
+        </button>
+        @endif
     </div>
 
 

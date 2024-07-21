@@ -40,6 +40,9 @@ class Index extends Component {
     public $timsetupid;
     public $nama;
     public $hargajual;
+    public $qtymin;
+    public $disc;
+
 
     public $timIdAktifPaket;
     public $isUpdatePaket = false;
@@ -135,7 +138,7 @@ class Index extends Component {
             'kotaid' => ['required'],
             'tglawal' => ['required', 'date'],
             'tglakhir' => ['required', 'date', 'after:tglawal'],
-            'angsuranhari' => ['required', 'numeric', 'min:1', 'max:10'],
+            'angsuranhari' => ['required', 'numeric', 'min:1', 'max:31'],
             'angsuranperiode' => ['required', 'numeric', 'min:1', 'max:10'],
             'pic' => ['required', 'min:3', 'max:255'],
         ]);
@@ -191,7 +194,7 @@ class Index extends Component {
                 'kotaid' => ['required'],
                 'tglawal' => ['required', 'date'],
                 'tglakhir' => ['required', 'date', 'after:tglawal'],
-                'angsuranhari' => ['required', 'numeric', 'min:1', 'max:10'],
+                'angsuranhari' => ['required', 'numeric', 'min:1', 'max:31'],
                 'angsuranperiode' => ['required', 'numeric', 'min:1', 'max:10'],
                 'pic' => ['required', 'min:3', 'max:255'],
             ];
@@ -283,6 +286,8 @@ class Index extends Component {
     //timsetuppaket
     public function createTimSetupPaket() {
         $this->hargajual = myNumber::str2Float($this->hargajual);
+        // $this->qtymin = myNumber::str2Float($this->qtymin);
+        $this->disc = myNumber::str2Float($this->disc);
 
         $rulesPaket = ([
             'nama' => [
@@ -293,6 +298,8 @@ class Index extends Component {
                 })
             ],
             'hargajual' => ['required', 'numeric', 'min:0'],
+            'qtymin' => ['integer', 'min:0'],
+            'disc' => ['numeric', 'between:0,100'],
         ]);
         $validatePaket = $this->validate($rulesPaket);
         $validatePaket['timsetupid'] = $this->timIdAktif;
@@ -316,8 +323,12 @@ class Index extends Component {
             $data = Timsetuppaket::find($this->timIdAktifPaket);
 
             $this->hargajual = mynumber::str2Float($this->hargajual);
+            // $this->qtymin = mynumber::str2Float($this->qtymin);
+            $this->disc = mynumber::str2Float($this->disc);
             $rulesPaket = [
                 'hargajual' => ['required', 'numeric', 'min:0'],
+                'qtymin' => ['integer', 'min:0'],
+                'disc' => ['numeric', 'between:0,100'],
             ];
 
             if ($this->nama != $data->nama) {
@@ -338,9 +349,13 @@ class Index extends Component {
                 $msg = 'Update data ' . $this->nama . ' berhasil.';
                 //$this->clearBarang();
                 $this->hargajual = mynumber::float2Str($this->hargajual);
+                // $this->qtymin = mynumber::float2Str($this->qtymin);
+                $this->disc = mynumber::float2Str($this->disc);
                 session()->flash('ok', $msg);
             } catch (\Exception $e) {
                 $this->hargajual = myNumber::float2Str($this->hargajual);
+                // $this->qtymin = myNumber::float2Str($this->qtymin);
+                $this->disc = myNumber::float2Str($this->disc);
                 $errors = implode("\n", array('Terjadi kesalahan:   ', 'Data sudah terpakai.', '(' . $e->getMessage() . ')'));
                 session()->flash('error', $errors);
             }
@@ -371,6 +386,8 @@ class Index extends Component {
         $this->timsetupid = "";
         $this->nama = "";
         $this->hargajual = "";
+        $this->qtymin = "";
+        $this->disc = "";
         $this->timIdAktifPaket = "";
         $this->isUpdatePaket = false;
         $this->myswitch(2);
@@ -381,6 +398,8 @@ class Index extends Component {
         $this->timsetupid = $data->timsetupid;
         $this->nama = $data->nama;
         $this->hargajual = myNumber::float2Str($data->hargajual);
+        $this->qtymin = $data->qtymin;
+        $this->disc = myNumber::float2Str($data->disc);
         $this->timIdAktifPaket = $data->id;
         $this->isUpdatePaket = true;
         $this->myswitch(2);
@@ -523,10 +542,10 @@ class Index extends Component {
             ->paginate(12);
 
         $dataTimSetupPaket = Timsetuppaket::where('timsetupid', $this->timIdAktif)
-            ->paginate(5);
+            ->get();
 
         $dataTimSetupBarang = Timsetupbarang::where('timsetuppaketid', $this->timIdAktifPaket)
-            ->paginate(5);
+            ->get();
 
         return view(
             'livewire.panel.timsetup.index',

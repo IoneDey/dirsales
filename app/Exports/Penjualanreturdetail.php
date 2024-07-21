@@ -6,11 +6,10 @@ use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 
-class Penagihan implements FromCollection, WithHeadings {
+class Penjualanreturdetail implements FromCollection, WithHeadings {
     /**
      * @return \Illuminate\Support\Collection
      */
-
     protected $data;
 
     public function __construct(Collection $data) {
@@ -19,26 +18,22 @@ class Penagihan implements FromCollection, WithHeadings {
 
     public function headings(): array {
         return [
-            'Nama Tim',
-            'Tanggal Dibuat',
+            'Tim',
+            'Timestamp',
+            'Tgl Retur',
             'Nota',
-            'Nama Pelanggan',
-            'Tanggal Penagihan',
-            'Nama Penagih',
-            'Foto Kwitansi',
-            'Jumlah Bayar',
-            'Biaya Komisi',
-            'Biaya Admin',
-            'Total',
-            'User Entry',
-            'Catatan',
-            'Rating',
-            'Kategori'
+            'Nama Customer',
+            'Barang',
+            'Qty',
+            '@Harga',
+            'Total Retur',
+            'Foto'
         ];
     }
 
     public function collection() {
-        //
+        // $db = DB::select('select * from users');
+        // return collect($db);
         return $this->data;
     }
 }
