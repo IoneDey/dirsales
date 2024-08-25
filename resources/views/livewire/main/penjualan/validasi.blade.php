@@ -1,5 +1,5 @@
 <div>
-    <link href="{{ asset('css/styles_table_res.css') }}" rel="stylesheet" />
+    <!-- <link href="{{ asset('css/styles_table_res.css') }}" rel="stylesheet" />
     <link href="{{ asset('css/style_alert_center_close.css') }}" rel="stylesheet" />
     <link href="{{ asset('css/styleSelect2.css') }}" rel="stylesheet" />
 
@@ -49,197 +49,244 @@
             position: relative !important;
             z-index: 1 !important;
         }
+    </style> -->
+
+    <link href="{{ asset('css/select2.css') }}" rel="stylesheet" />
+
+    <style>
+        /* batasan heigh */
+        .table-responsive {
+            max-height: 50vh;
+            overflow-y: auto;
+            overflow-x: auto;
+        }
+
+        /* Header tetap terlihat */
+        thead th {
+            position: sticky;
+            top: 0;
+            background-color: #f8f9fa;
+            z-index: 10;
+            box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Kolom pertama tetap terlihat */
+        table td:first-child,
+        table th:first-child {
+            position: sticky;
+            left: 0;
+            background-color: #f8f9fa;
+            z-index: 5;
+            box-shadow: 2px 0 2px -1px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Tambahan khusus untuk area pertemuan */
+        table th:first-child {
+            z-index: 15;
+        }
+
+        /* Tambahan khusus untu Header Tidak ikut scroll */
+        thead th:not(:first-child) {
+            position: sticky;
+            top: 0;
+            background-color: #f8f9fa;
+            z-index: 9;
+        }
+
+        .rata-kanan {
+            text-align: right;
+        }
+
+        .rata-tengah {
+            text-align: center;
+        }
     </style>
 
-    <div class="container col-12" style="padding: 3px;">
-        @if ($errors->any())
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <ul>
-                @foreach ($errors->all() as $error)
-                <pre>{{ $error }}</pre>
-                @endforeach
-            </ul>
-            <button wire:click="resetErrors" type="button" class="btn-close" data-bs-dismiss="alert" aria-label=""></button>
-        </div>
-        @endif
+    @if ($errors->any())
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <ul>
+            @foreach ($errors->all() as $error)
+            <pre>{{ $error }}</pre>
+            @endforeach
+        </ul>
+        <button wire:click="resetErrors" type="button" class="btn-close" data-bs-dismiss="alert" aria-label=""></button>
+    </div>
+    @endif
 
-        @if(session()->has('ok'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <ul>
-                <pre>{!! session('ok') !!} </pre>
-            </ul>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label=""></button>
-        </div>
-        @endif
+    @if(session()->has('ok'))
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <ul>
+            <pre>{{ session('ok') }} </pre>
+        </ul>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label=""></button>
+    </div>
+    @endif
 
-        @if(session()->has('error'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <ul>
-                <pre>{!! session('error') !!} </pre>
-            </ul>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label=""></button>
-        </div>
-        @endif
+    @if(session()->has('error'))
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <ul>
+            <pre>{{ session('error') }} </pre>
+        </ul>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label=""></button>
+    </div>
+    @endif
 
-        <h2 class="text-center">{{ $title }}</h2>
-
-        <div class="container">
-
-            <div class="row justify-content-center">
-                <div class="col-md-3 col-12 mb-1 p-1 g-0">
-                    <div class="input-group">
-                        <span class="input-group-text">Tgl Awal</span>
+    <div class="card">
+        <div class="col-md-12">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-md-6 col-lg-4 mb-3">
+                        <span class="input-label">Tgl Awal</span>
                         <input wire:model.live.debounce.500ms="tglAwal" type="date" class="form-control" aria-label="Tgl Awal">
                     </div>
-                </div>
 
-                <div class="col-md-3 col-12 mb-1 p-1 g-0">
-                    <div class="input-group">
-                        <span class="input-group-text">Tgl Akhir</span>
+                    <div class="col-md-6 col-lg-4 mb-3">
+                        <span class="input-label">Tgl Akhir</span>
                         <input wire:model.live.debounce.500ms="tglAkhir" type="date" class="form-control" aria-label="Tgl Akhir">
                     </div>
-                </div>
 
-                <div class="col-md-3 col-12 mb-1 p-1 g-0">
-                    <div class="d-flex align-items-left" x-data="{ isUpdate: @entangle('isUpdate') }" wire:ignore>
-                        <span class="me-0 input-group-text" style="padding: 0.375rem 0.5rem; border-radius: 0.25rem 0 0 0; margin-right: -0.5rem; height: 38px;">Tim</span>
-                        <select x-data="{item: @entangle('timsetupid')}" x-init="$($refs.select2ref).select2(); $($refs.select2ref).on('change', function(){$wire.set('timsetupid', $(this).val());});" x-effect="$refs.select2ref.value = item; $($refs.select2ref).select2();" x-ref="select2ref" :disabled="isUpdate" class="form-select" aria-label="Tim">
-                            <option value='Semua'>Semua</option>
-                            @foreach ($dbTimsetups as $dbTimsetup)
-                            <option value="{{ $dbTimsetup->id }}">{{ $dbTimsetup->joinTim->nama }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    @error('timsetupid')
-                    <span style="font-size: smaller; color: red;">{{ $message }}</span>
-                    @enderror
-                </div>
-            </div>
-
-
-            <div class="col-12 mt-1 mb-1">
-                <input class="border rounded" wire:model.live.debounce.500ms="cari" type="text" id="cari" placeholder="cari nota/nama/no.telp ....">
-            </div>
-            <div class="table-responsive">
-                <table class="table table-sm table-bordered table-striped table-hover" style="width: 100%;">
-                    <thead>
-                        <tr>
-                            @if (in_array(auth()->user()->roles ?? '', ['SUPERVISOR', 'SPV ADMIN']))
-                            <th>Act</th>
-                            @endif
-                            <th>Tim</th>
-                            <th>Nota</th>
-                            <th>Kota</th>
-                            <th>Kecamatan</th>
-                            <th>Tgl Jual</th>
-                            <th>Nama Customer</th>
-                            <th>Alamat Customer</th>
-                            <th>Telp Customer</th>
-                            <th>Share Loc</th>
-                            <th>Nama Sales</th>
-                            <th>Nama Lock</th>
-                            <th>Nama Driver</th>
-                            <th>PJ Kurir Nota</th>
-                            <th>PJ Admin Nota</th>
-                            <th class="rata-kanan">Tot Jumlah</th>
-                            <th>Barang</th>
-                            <th>Foto KTP</th>
-                            <th>Foto Nota</th>
-                            <th>Foto Nota Rekap</th>
-                            <th>Status</th>
-                            <th>User Entry</th>
-                            <th>Timestamp</th>
-                            <th>Act</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($penjualanhds as $penjualanhd)
-                        <tr>
-                            @if (in_array(auth()->user()->roles ?? '', ['SUPERVISOR', 'SPV ADMIN']))
-                            <td>
-                                <a type="button" class="badge bg-warning bg-sm" href="{{ route('penjualanvalidasiedit', ['id' => $penjualanhd->id, 'tglAwal' => $tglAwal, 'tglAkhir' => $tglAkhir, 'cari' => $cari]) }}" title="Edit">
-                                    <i class="bi bi-pencil-fill"></i>
-                                </a>
-                                <a wire:click="cekValidasi('{{ $penjualanhd->timsetupid }}','{{ $penjualanhd->nota }}')" type="button" class="badge bg-success bg-sm" data-bs-toggle="modal" data-bs-target="#ModalValid" title="Validasi"><i class="bi bi-lock"></i></a>
-                            </td>
-                            @endif
-                            <td>{{ $penjualanhd->joinTimSetup->jointim->nama }}</td>
-                            <td>{{ $penjualanhd->nota }}</td>
-                            <td>{{ $penjualanhd->joinTimSetup->joinkota->nama }}</td>
-                            <td>{{ $penjualanhd->kecamatan }}</td>
-                            <td>{{ $penjualanhd->tgljual }}</td>
-                            <td>{{ $penjualanhd->customernama }}</td>
-                            <td>{{ $penjualanhd->customeralamat }}</td>
-                            <td>{{ $penjualanhd->customernotelp }}</td>
-                            <td>{{ $penjualanhd->shareloc }}</td>
-                            <td>{{ $penjualanhd->namasales }}</td>
-                            <td>{{ $penjualanhd->namalock }}</td>
-                            <td>{{ $penjualanhd->namadriver }}</td>
-                            <td>{{ $penjualanhd->pjkolektornota }}</td>
-                            <td>{{ $penjualanhd->pjadminnota }}</td>
-                            <td class="rata-kanan">{{ number_format(($penjualanhd->hargajual_total ?? 0), 0, ',', '.') }}</td>
-                            <td>
-                                @foreach($penjualanhd->joinPenjualandt as $penjualandt)
-                                <li>
-                                    {{ $penjualandt->joinTimSetupPaket->nama }} (Qty: {{ $penjualandt->jumlah+$penjualandt->jumlahkoreksi }})
-                                    <ul>
-                                        @foreach($penjualandt->joinTimSetupPaket->joinTimSetupBarang as $barang)
-                                        <li>{{ $barang->joinBarang->nama }}</li>
-                                        @endforeach
-                                    </ul>
-                                </li>
+                    <div class="col-md-6 col-lg-4 mb-3">
+                        <div x-data="{ isUpdate: @entangle('isUpdate') }" wire:ignore>
+                            <span class="input-label">Tim</span>
+                            <select x-data="{item: @entangle('timsetupid')}" x-init="$($refs.select2ref).select2(); $($refs.select2ref).on('change', function(){$wire.set('timsetupid', $(this).val());});" x-effect="$refs.select2ref.value = item; $($refs.select2ref).select2();" x-ref="select2ref" :disabled="isUpdate" class="form-select input-group-item" aria-label="Tim">
+                                <option value='Semua'>Semua</option>
+                                @foreach ($dbTimsetups as $dbTimsetup)
+                                <option value="{{ $dbTimsetup->id }}">{{ $dbTimsetup->joinTim->nama }}</option>
                                 @endforeach
-                            </td>
-                            <td><a href="{{ asset('storage/' . $penjualanhd->fotoktp ) }}" target="_blank">{{ $penjualanhd->fotoktp }}</a></td>
-                            <td><a href="{{ asset('storage/' . $penjualanhd->fotonota ) }}" target="_blank">{{ $penjualanhd->fotonota }}</a></td>
-                            <td><a href="{{ asset('storage/' . $penjualanhd->fotonotarekap ) }}" target="_blank">{{ $penjualanhd->fotonotarekap }}</a></td>
-                            <td>{{ $penjualanhd->status }}</td>
-                            <td>{{ $penjualanhd->joinUser->name }}</td>
-                            <td>{{ $penjualanhd->updated_at }}</td>
-                            <td>
-                                <a type="button" class="badge bg-warning bg-sm" href="{{ route('penjualanvalidasiedit', ['id' => $penjualanhd->id, 'tglAwal' => $tglAwal, 'tglAkhir' => $tglAkhir, 'cari' => $cari]) }}" title="Edit">
-                                    <i class="bi bi-pencil-fill"></i>
-                                </a>
-                                <a wire:click="cekValidasi('{{ $penjualanhd->timsetupid }}','{{ $penjualanhd->nota }}')" type="button" class="badge bg-success bg-sm" data-bs-toggle="modal" data-bs-target="#ModalValid" title="Validasi"><i class="bi bi-lock"></i></a>
-                            </td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td class="rata-kanan">Grand Total</td>
-                            <td class="rata-kanan">{{ number_format(($grandTotal->totaljual ?? 0), 0, ',', '.') }}</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                    </tfoot>
-                </table>
+                            </select>
+                        </div>
+                        @error('timsetupid')
+                        <span style="font-size: smaller; color: red;">{{ $message }}</span>
+                        @enderror
+                    </div>
+                </div>
             </div>
-            {{ $penjualanhds->links() }}
+
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-md-6 col-lg-4 mb-3">
+                        <input class="form-control" wire:model.live.debounce.500ms="cari" type="text" id="cari" placeholder="cari nota/nama/no.telp ....">
+                    </div>
+
+                    <div class="card-body">
+                        <div class="table-responsive text-nowrap">
+                            <table class="display table table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Act</th>
+                                        <th>Tim</th>
+                                        <th>Nota</th>
+                                        <th>Kota</th>
+                                        <th>Kecamatan</th>
+                                        <th>Tgl Jual</th>
+                                        <th>Nama Customer</th>
+                                        <th>Alamat Customer</th>
+                                        <th>Telp Customer</th>
+                                        <th>Share Loc</th>
+                                        <th>Nama Sales</th>
+                                        <th>Nama Lock</th>
+                                        <th>Nama Driver</th>
+                                        <th>PJ Kurir Nota</th>
+                                        <th>PJ Admin Nota</th>
+                                        <th class="rata-kanan">Tot Jumlah</th>
+                                        <th>Barang</th>
+                                        <th>Foto KTP</th>
+                                        <th>Foto Nota</th>
+                                        <th>Foto Nota Rekap</th>
+                                        <th>Status</th>
+                                        <th>User Entry</th>
+                                        <th>Timestamp</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($penjualanhds as $penjualanhd)
+                                    <tr>
+                                        <td>
+                                            <a type="button" class="badge bg-warning bg-sm" href="{{ route('penjualanvalidasiedit', ['id' => $penjualanhd->id, 'tglAwal' => $tglAwal, 'tglAkhir' => $tglAkhir, 'cari' => $cari]) }}" title="Edit">
+                                                <i class="fas fa-edit fa-lg"></i>
+                                            </a>
+                                            <a type="button" class="badge bg-success bg-sm" data-bs-toggle="modal" data-bs-target="#ModalValid" title="Validasi" wire:click="cekValidasi('{{ $penjualanhd->timsetupid }}','{{ $penjualanhd->nota }}')">
+                                                <i class="fas fa-lock fa-lg"></i>
+                                            </a>
+                                        </td>
+                                        <td>{{ $penjualanhd->joinTimSetup->jointim->nama }}</td>
+                                        <td>{{ $penjualanhd->nota }}</td>
+                                        <td>{{ $penjualanhd->joinTimSetup->joinkota->nama }}</td>
+                                        <td>{{ $penjualanhd->kecamatan }}</td>
+                                        <td>{{ $penjualanhd->tgljual }}</td>
+                                        <td>{{ $penjualanhd->customernama }}</td>
+                                        <td>{{ $penjualanhd->customeralamat }}</td>
+                                        <td>{{ $penjualanhd->customernotelp }}</td>
+                                        <td>{{ $penjualanhd->shareloc }}</td>
+                                        <td>{{ $penjualanhd->namasales }}</td>
+                                        <td>{{ $penjualanhd->namalock }}</td>
+                                        <td>{{ $penjualanhd->namadriver }}</td>
+                                        <td>{{ $penjualanhd->pjkolektornota }}</td>
+                                        <td>{{ $penjualanhd->pjadminnota }}</td>
+                                        <td class="rata-kanan">{{ number_format(($penjualanhd->hargajual_total ?? 0), 0, ',', '.') }}</td>
+                                        <td>
+                                            @foreach($penjualanhd->joinPenjualandt as $penjualandt)
+                                            <li>
+                                                {{ $penjualandt->joinTimSetupPaket->nama }} (Qty: {{ $penjualandt->jumlah+$penjualandt->jumlahkoreksi }})
+                                                <ul>
+                                                    @foreach($penjualandt->joinTimSetupPaket->joinTimSetupBarang as $barang)
+                                                    <li>{{ $barang->joinBarang->nama }}</li>
+                                                    @endforeach
+                                                </ul>
+                                            </li>
+                                            @endforeach
+                                        </td>
+                                        <td><a href="{{ asset('storage/' . $penjualanhd->fotoktp ) }}" target="_blank">{{ $penjualanhd->fotoktp }}</a></td>
+                                        <td><a href="{{ asset('storage/' . $penjualanhd->fotonota ) }}" target="_blank">{{ $penjualanhd->fotonota }}</a></td>
+                                        <td><a href="{{ asset('storage/' . $penjualanhd->fotonotarekap ) }}" target="_blank">{{ $penjualanhd->fotonotarekap }}</a></td>
+                                        <td>{{ $penjualanhd->status }}</td>
+                                        <td>{{ $penjualanhd->joinUser->name }}</td>
+                                        <td>{{ $penjualanhd->updated_at }}</td>
+
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td class="rata-kanan">Grand Total</td>
+                                        <td class="rata-kanan">{{ number_format(($grandTotal->totaljual ?? 0), 0, ',', '.') }}</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                        <div class="card-body">
+                            {{ $penjualanhds->links() }}
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- test wa dan spreadsheet -->
+        @if (in_array(auth()->user()->roles ?? '', ['SUPERVISOR', 'SPV ADMIN']))
         <!-- <button wire:click="testSendWA"> test send wa</button> -->
+        @endif
     </div>
 
     <!-- modal valid -->

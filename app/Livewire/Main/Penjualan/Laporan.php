@@ -440,7 +440,7 @@ class Laporan extends Component {
         return view('livewire.main.penjualan.laporan', [
             'grandTotal' => $gTotalJual,
             'penjualanhds' => $penjualanhds,
-        ])->layout('layouts.app-layout', [
+        ])->layout('layouts.kai-layout', [
             'menu' => 'navmenu.main',
             'title' => $this->title,
         ]);

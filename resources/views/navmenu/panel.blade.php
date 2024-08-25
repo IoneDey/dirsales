@@ -35,6 +35,13 @@
                     <div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
                     User
                 </a>
+
+                <a class="{{ Request::is('panel/utility/sendwatagihan') ? 'active' : '' }} nav-link" href="{{ route('sendwatagihan') }}">
+                    <div class="sb-nav-link-icon"><i class="bi bi-send"></i></div>
+                    Send WA
+                </a>
+
+
                 <hr>
 
                 <a class="{{ $isActive ? 'active' : '' }} nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseInventory" aria-expanded="false" aria-controls="collapseLayouts">

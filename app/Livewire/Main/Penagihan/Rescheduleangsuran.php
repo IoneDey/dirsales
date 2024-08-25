@@ -150,7 +150,7 @@ class Rescheduleangsuran extends Component {
         $Sql = "
             SELECT
                 X.*,
-                @saldo := @saldo + (IFNULL(x.debet, 0) - x.kredit) AS saldo
+                @saldo := @saldo + (IFNULL(X.debet, 0) - X.kredit) AS saldo
             FROM
             (
             SELECT
@@ -187,9 +187,8 @@ class Rescheduleangsuran extends Component {
     public function getInformasiAngsuran($nota) {
         $escNota = $this->esc_chars($nota);
 
-        if ($this->selectedOption == 'Up' || $this->selectedOption == 'Down') {
-            // reschedule angsuran up
-            $urutan = ($this->selectedOption == 'Up' ? 'asc' : 'desc');
+        // reschedule angsuran rata2
+        if ($this->selectedOption == 'Avg') {
             $Sql = "
             WITH RECURSIVE cteAngsuran AS (
                 SELECT
@@ -252,80 +251,31 @@ class Rescheduleangsuran extends Component {
                     penagihans a
                     LEFT JOIN cteAngsuranTagih b ON a.tglpenagihan = b.tglpenagihan
                     AND (a.jumlahbayar+a.biayakomisi+a.biayaadmin) = b.jmlpenagihan
-                    and a.nota=b.nota and a.timsetupid=b.timsetupid
                 WHERE
                     b.tglpenagihan IS NULL
                 ),
-                `ctereturjual` AS (
+                cteDataAngsuran AS (
                 SELECT
-                    `penjualanrets`.`timsetupid` AS `timsetupid`,
-                    `penjualanrets`.`nota` AS `nota`,
-                    sum((
-                            `penjualanrets`.`qty` * `penjualanrets`.`harga`
-                        )) AS `jumlahretur`
+                    a.timsetupid,
+                    a.nota,
+                    SUM(( b.jumlah + b.jumlahkoreksi )* c.hargajual ) AS totaljual,
+                    a.angsuranhari,
+                    a.angsuranperiode,
+                    SUM(( b.jumlah + b.jumlahkoreksi ) * c.hargajual ) / a.angsuranperiode AS perangsuran,
+                    CEIL( SUM(( b.jumlah + b.jumlahkoreksi ) * c.hargajual ) / a.angsuranperiode / 1 ) * 1 AS perangsuranUp,
+                    FLOOR( SUM(( b.jumlah + b.jumlahkoreksi ) * c.hargajual ) / a.angsuranperiode / 1 ) * 1 AS perangsuranDown,
+                    FLOOR( SUM(( b.jumlah + b.jumlahkoreksi ) * c.hargajual ) / a.angsuranperiode ) AS perangsuranBulat,
+                    a.STATUS
                 FROM
-                    `penjualanrets`
+                    penjualanhds a
+                    LEFT JOIN penjualandts b ON a.id = b.penjualanhdid
+                    LEFT JOIN timsetuppakets c ON c.id = b.timsetuppaketid
                 GROUP BY
-                    `penjualanrets`.`timsetupid`,
-                    `penjualanrets`.`nota`
-                ),
-                `ctedataangsuran` AS (
-                SELECT
-                    `a`.`timsetupid` AS `timsetupid`,
-                    `a`.`nota` AS `nota`,(
-                        sum(((
-                                    `b`.`jumlah` + `b`.`jumlahkoreksi`
-                                    ) * `c`.`hargajual`
-                            )) - avg( ifnull(`d`.`jumlahretur`,0) )) AS `totaljual`,
-                    `a`.`angsuranhari` AS `angsuranhari`,
-                    `a`.`angsuranperiode` AS `angsuranperiode`,((
-                            sum(((
-                                        `b`.`jumlah` + `b`.`jumlahkoreksi`
-                                        ) * `c`.`hargajual`
-                                )) - avg( ifnull(`d`.`jumlahretur`,0) )) / `a`.`angsuranperiode`
-                        ) AS `perangsuran`,(
-                        ceiling((((
-                                        sum(((
-                                                    `b`.`jumlah` + `b`.`jumlahkoreksi`
-                                                    ) * `c`.`hargajual`
-                                            )) - avg( ifnull(`d`.`jumlahretur`,0) )) / `a`.`angsuranperiode`
-                                    ) / 1
-                            )) * 1
-                        ) AS `perangsuranUp`,(
-                        floor((((
-                                        sum(((
-                                                    `b`.`jumlah` + `b`.`jumlahkoreksi`
-                                                    ) * `c`.`hargajual`
-                                            )) - avg( ifnull(`d`.`jumlahretur`,0) )) / `a`.`angsuranperiode`
-                                    ) / 1
-                            )) * 1
-                    ) AS `perangsuranDown`,
-                    floor(((
-                                sum(((
-                                            `b`.`jumlah` + `b`.`jumlahkoreksi`
-                                            ) * `c`.`hargajual`
-                                    )) - avg( ifnull(`d`.`jumlahretur`,0) )) / `a`.`angsuranperiode`
-                        )) AS `perangsuranBulat`,
-                    `a`.`status` AS `STATUS`
-                FROM
-                    (((
-                                `penjualanhds` `a`
-                                LEFT JOIN `penjualandts` `b` ON ((
-                                        `a`.`id` = `b`.`penjualanhdid`
-                                    )))
-                            LEFT JOIN `timsetuppakets` `c` ON ((
-                                    `c`.`id` = `b`.`timsetuppaketid`
-                                )))
-                        LEFT JOIN `ctereturjual` `d` ON (((
-                                    `a`.`timsetupid` = `d`.`timsetupid`
-                                    )
-                            AND ( `a`.`nota` = `d`.`nota` ))))
-                GROUP BY
-                    `a`.`timsetupid`,
-                    `a`.`nota`,
-                    `a`.`angsuranhari`,
-                    `a`.`angsuranperiode`,
-                    `a`.`status`
+                    a.timsetupid,
+                    a.nota,
+                    a.angsuranhari,
+                    a.angsuranperiode,
+                    a.STATUS
                 ),
                 cteNormalAngsuran AS (
                 SELECT
@@ -343,91 +293,56 @@ class Rescheduleangsuran extends Component {
                     LEFT JOIN cteDataAngsuran b ON a.nota = b.nota and a.timsetupid=b.timsetupid
                     AND a.angsuranperiode = b.angsuranperiode
                     WHERE a.nota = '$escNota' and a.timsetupid='$this->timsetupid'
-                ) ,
+                ),
                 cteTotalTagih AS (
                     SELECT
                         timsetupid, nota, max( tglpenagihan ) AS tglTerakhir, sum(jumlahbayar+biayakomisi+biayaadmin) AS totTertagih
                     FROM penagihans
                     WHERE nota = '$escNota' and timsetupid='$this->timsetupid'
                     GROUP BY timsetupid,nota
-                ) , cteSisaPeriodeAngsuran AS
+                ), cteSisaPeriodeAngsuran AS
                 (
                     select
-                        a.timsetupid,a.nota,count(a.nota) as reAngsuranperiode
+                        a.timsetupid, a.nota,count(a.nota) as reAngsuranperiode
                     from cteNormalAngsuran a
                     left join cteTotalTagih b on a.nota=b.nota and a.timsetupid=b.timsetupid
                     where a.angsuranke<>0 and a.tglpenagihan is NULL
                     and a.tglangsuran > b.tglTerakhir
-                    group by a.timsetupid, a.nota
+                    group by a.timsetupid,a.nota
                 ), cteDataReschedulePenagihan AS
                 (
                 select
                     a.*,b.reAngsuranperiode
                 from cteTotalTagih a
                 left join cteSisaPeriodeAngsuran b on a.nota=b.nota and a.timsetupid=b.timsetupid
-                ),
-                cteReScheduleAngsuranF1 AS
+                ), cteReScheduleAngsuran AS
                 (
                     SELECT
-                        angsuranke,
-                        timsetupid,
-                        nota,
-                        max( totaljual ) AS totaljual,
-                        avg(
-                        COALESCE ( perangsuran, 0 )) AS totperangsuran,
-                        sum(
-                        COALESCE ( jmlpenagihan, 0 )) AS totjmlpenagihan,
-                        avg(
-                            COALESCE ( perangsuran, 0 )) - sum(
-                        COALESCE ( jmlpenagihan, 0 )) AS selisihterbayar
+                        a.timsetupid, a.nota,a.totaljual,perangsuran,angsuranke,tglangsuran,tglpenagihan,jmlpenagihan,statuspenjualan
                     FROM
-                        cteNormalAngsuran
-                    WHERE
-                        tglangsuran <= COALESCE (( SELECT tglTerakhir FROM cteDataReschedulePenagihan ), tglangsuran )
-                    GROUP BY
-                        angsuranke,
-                        timsetupid,
-                        nota
-            ), cteReScheduleAngsuranF1a as
-            (
-                SELECT
-                    timsetupid,nota,avg(ifnull(totaljual,0)) as totaljual,
-                    sum(totperangsuran) as totperangsuran,
-                    sum(totjmlpenagihan) as totjmlpenagihan,
-                    sum(totperangsuran) - sum(totjmlpenagihan) as selisihterbayar
-                from cteReScheduleAngsuranF1
-                GROUP BY
-                timsetupid,
-                nota
-            ), cteReScheduleAngsuranF2 AS
-            (
-                SELECT
-                    a.timsetupid,
-                    a.nota,a.totaljual,
-                    a.perangsuran as perangsuran,
-                    a.angsuranke,a.tglangsuran,a.tglpenagihan,
-                    a.jmlpenagihan,a.statuspenjualan,b.selisihterbayar,
-                    ROW_NUMBER() OVER (order by tglangsuran $urutan) as urut
-                FROM cteNormalAngsuran a
-                left join cteReScheduleAngsuranF1a b on a.nota=b.nota and a.timsetupid=b.timsetupid
-                where a.tglangsuran > COALESCE((select tglTerakhir from cteDataReschedulePenagihan),a.tglangsuran)
-            ), cteReScheduleAngsuranF3 AS
-            (
-                select
-                    timsetupid, nota,totaljual,perangsuran,angsuranke,tglangsuran,tglpenagihan,jmlpenagihan,statuspenjualan
-                from cteNormalAngsuran
-                where tglangsuran <= COALESCE((select tglTerakhir from cteDataReschedulePenagihan),tglangsuran)
-                union all
-                select
-                    timsetupid,nota,totaljual,if(urut=1,selisihterbayar,0) + perangsuran as perangsuran,angsuranke,tglangsuran,tglpenagihan,jmlpenagihan,statuspenjualan
-                from cteReScheduleAngsuranF2
+                        cteNormalAngsuran a
+                    where a.tglangsuran <= COALESCE((select tglTerakhir from cteDataReschedulePenagihan),a.tglangsuran)
+                    union all
+                    SELECT
+                        a.timsetupid, a.nota,a.totaljual,(a.totaljual-b.totTertagih) / reAngsuranperiode as perangsuran,a.angsuranke,a.tglangsuran,a.tglpenagihan,
+                        a.jmlpenagihan,a.statuspenjualan
+                    FROM cteNormalAngsuran a
+                    left join cteDataReschedulePenagihan b on a.nota=b.nota and a.timsetupid=b.timsetupid
+                    where a.tglangsuran > COALESCE((select tglTerakhir from cteDataReschedulePenagihan),a.tglangsuran)
             )
-            select
-                a.*,b.namapenagih
-            from cteReScheduleAngsuranF3 a
-            left join penagihans b on a.nota=b.nota and a.timsetupid=b.timsetupid and a.tglpenagihan=b.tglpenagihan
-            order by a.tglangsuran,a.tglpenagihan,a.nota
+            select * from cteReScheduleAngsuran
+            ORDER BY
+                tglangsuran,
+                tglpenagihan,
+                nota;
         ";
+        };
+
+        if ($this->selectedOption == 'Up' || $this->selectedOption == 'Down') {
+            $Sql = "
+                select * from vwlistangsuran
+                WHERE nota = '$escNota' and timsetupid='$this->timsetupid'
+            ";
         };
         $this->dbInfoAngsuran = DB::select($Sql);
     }
@@ -495,7 +410,7 @@ class Rescheduleangsuran extends Component {
 
         return view('livewire.main.penagihan.rescheduleangsuran', [
             'dbKartus' => $this->dbKartuPiutang,
-        ])->layout('layouts.app-layout', [
+        ])->layout('layouts.kai-layout', [
             'menu' => 'navmenu.main',
             'title' => $this->title,
         ]);

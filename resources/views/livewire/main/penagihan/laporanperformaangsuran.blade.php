@@ -2,6 +2,7 @@
     {{-- Because she competes with no one, no one can compete with her. --}}
     <link href="{{ asset('css/styleSelect2.css') }}" rel="stylesheet" />
     <link href="{{ asset('css/styles_table_res.css') }}" rel="stylesheet" />
+    <link href="{{ asset('sneat/css/style-spinner.css') }}" rel="stylesheet" />
     <style>
         @media (max-width: 768px) {
             .input-group-item {
@@ -201,6 +202,13 @@
         </div>
         @endforeach
 
+    </div>
 
+    <div wire:loading>
+        <div class="loading-overlay"></div>
+        <div class="centered-spinner">
+            <div class="spinner-border spinner-border-lg text-primary" role="status">
+            </div>
+        </div>
     </div>
 </div>

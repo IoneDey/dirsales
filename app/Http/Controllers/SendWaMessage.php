@@ -7,9 +7,10 @@ use Illuminate\Http\Request;
 
 class SendWaMessage extends Controller {
 
-    public function sendMessage($phoneNo, $message) {
+    public function sendMessage($waNumberKey, $phoneNo, $message) {
         $apiKey = env('WHATSAPP_API_KEY');
-        $numberKey = env('WHATSAPP_NUMBER_KEY');
+        // $numberKey = env('WHATSAPP_NUMBER_KEY');
+        $numberKey = $waNumberKey;
 
         $curl = curl_init();
 
@@ -39,9 +40,10 @@ class SendWaMessage extends Controller {
         return $response;
     }
 
-    public function sendMessageWithImage($phoneNo, $imageUrl, $message, $separateCaption) {
+    public function sendMessageWithImage($waNumberKey, $phoneNo, $imageUrl, $message, $separateCaption) {
         $apiKey = env('WHATSAPP_API_KEY');
-        $numberKey = env('WHATSAPP_NUMBER_KEY');
+        // $numberKey = env('WHATSAPP_NUMBER_KEY');
+        $numberKey = $waNumberKey;
 
         $curl = curl_init();
 

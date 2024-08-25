@@ -27,7 +27,8 @@ class Penjualanreturdetail implements FromCollection, WithHeadings {
             'Qty',
             '@Harga',
             'Total Retur',
-            'Foto'
+            'Foto',
+            'QtyValid',
         ];
     }
 

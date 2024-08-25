@@ -17,6 +17,7 @@ class Index extends Component {
     public $notelp = '';
     public $flagdriver = false;
     public $flagkolektor = false;
+    public $flagsurveyor = false;
 
     //--end field + validation set
 
@@ -45,6 +46,7 @@ class Index extends Component {
         $this->notelp = "";
         $this->flagdriver = false;
         $this->flagkolektor = false;
+        $this->flagsurveyor = false;
         $this->isUpdate = false;
         $this->tmpId = null;
     }
@@ -58,6 +60,7 @@ class Index extends Component {
             $this->notelp = $data->notelp;
             $this->flagdriver = (bool) $data->flagdriver;
             $this->flagkolektor = (bool) $data->flagkolektor;
+            $this->flagsurveyor = (bool) $data->flagsurveyor;
 
             $this->isUpdate = true;
             $this->tmpId = $id;
@@ -76,6 +79,7 @@ class Index extends Component {
         'notelp.max' => 'nomer telp tidak boleh lebih dari 20 digit.',
         'flagdriver.bollean' => 'status true/false',
         'flagkolektor.bollean' => 'status true/false',
+        'flagsurveyor.bollean' => 'status true/false',
     ];
 
     public function create() {
@@ -85,6 +89,7 @@ class Index extends Component {
             'notelp' => 'string|min:10|max:20',
             'flagdriver' => 'boolean',
             'flagkolektor' => 'boolean',
+            'flagsurveyor' => 'boolean',
         ];
 
         $validatedData = $this->validate($rules, $this->messages);
@@ -109,6 +114,7 @@ class Index extends Component {
                 'notelp' => 'string|min:10|max:20',
                 'flagdriver' => 'boolean',
                 'flagkolektor' => 'boolean',
+                'flagsurveyor' => 'boolean',
             ];
             if (($this->nik != $data->nik)) {
                 $rules['nik'] = ['required', 'min:5', 'max:10', 'unique:karyawans,nik'];

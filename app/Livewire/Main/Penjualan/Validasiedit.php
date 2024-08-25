@@ -34,7 +34,7 @@ class Validasiedit extends Component {
     public $namalock;
     public $namadriver;
     public $pjkolektornota;
-    public $pjkolektorasisten;
+    public $pjkolektorasisten = '';
     public $pjadminnota;
     public $fotoktp;
     public $fotosuratundian;
@@ -63,6 +63,7 @@ class Validasiedit extends Component {
     //db
     public $dbTimsetups;
     public $dbSales;
+    public $dbSurveyors;
     public $dbDrivers;
     public $dbKolektors;
 
@@ -84,6 +85,7 @@ class Validasiedit extends Component {
 
         $this->dbTimsetups = Timsetup::get();
         $this->dbDrivers = DB::select("SELECT nama FROM `karyawans` where void=0 and flagdriver=1");
+        $this->dbSurveyors = DB::select("SELECT nama FROM `karyawans` where void=0 and flagsurveyor=1");
         $this->dbKolektors = DB::select("SELECT nama FROM `karyawans` where void=0 and flagkolektor=1");
 
         $this->getData($id);
@@ -150,12 +152,14 @@ class Validasiedit extends Component {
                 'pjkolektorasisten' => 'string|max:150',
                 'pjadminnota' => 'required|string|max:150',
                 'catatan' => 'string|max:255',
-                'tglakad' => 'required|date',
+                'tglakad' => 'nullable|date',
             ];
 
             if ($this->nota != $data->nota) {
                 $rules['nota'] = [
-                    'required', 'min:15', 'max:15',
+                    'required',
+                    'min:15',
+                    'max:15',
                     Rule::unique('penjualanhds')->where(function ($query) {
                         return $query->where('nota', $this->nota)
                             ->where('timsetupid', $this->timsetupid);
@@ -274,7 +278,7 @@ class Validasiedit extends Component {
         $this->namalock = $data->namalock;
         $this->namadriver = $data->namadriver;
         $this->pjkolektornota = $data->pjkolektornota;
-        $this->pjkolektorasisten = $data->pjkolektorasisten;
+        $this->pjkolektorasisten = $data->pjkolektorasisten ?? '';
         $this->pjadminnota = $data->pjadminnota;
         $this->fotoktp = $data->fotoktp;
         $this->fotosuratundian = $data->fotosuratundian;
@@ -421,7 +425,8 @@ class Validasiedit extends Component {
             'dbTimssetuppakets' => $dbTimssetuppakets,
             'dbPenjualandts' => $dbPenjualandts,
             'dbSaless' => $this->dbSales,
-        ])->layout('layouts.app-layout', [
+            'dbSurveyorss' => $this->dbSurveyors,
+        ])->layout('layouts.kai-layout', [
             'menu' => 'navmenu.main',
             'title' => $this->title,
         ]);

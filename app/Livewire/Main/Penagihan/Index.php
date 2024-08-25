@@ -152,7 +152,7 @@ class Index extends Component {
                 timsetupid,nota,avg(totaljual) as totaljual,
                 avg(perangsuran) as perangsuran,angsuranke,tglangsuran,
                 sum(jmlpenagihan) as jmlpenagihan, angsuranhari
-            from vwListAngsuran
+            from vwlistangsuran
             where nota='$this->nota' and timsetupid=$partimsetupid and
             DATE_FORMAT('$this->tglpenagihan','%Y-%m-%d') BETWEEN tglangsuran and DATE_ADD(tglangsuran,INTERVAL angsuranhari-1 day)
             group by timsetupid,nota,angsuranke,tglangsuran,angsuranhari
@@ -202,7 +202,7 @@ class Index extends Component {
         $Sql = "
             SELECT
                 X.*,
-                @saldo := @saldo + (IFNULL(x.debet, 0) - x.kredit) AS saldo
+                @saldo := @saldo + (IFNULL(X.debet, 0) - X.kredit) AS saldo
             FROM
             (
             SELECT
@@ -800,7 +800,9 @@ class Index extends Component {
 
         $rules = [
             'nota' => [
-                'required', 'min:15', 'max:15',
+                'required',
+                'min:15',
+                'max:15',
                 Rule::unique('penagihans')->where(function ($query) {
                     return $query->where('nota', $this->nota)
                         ->where('tglpenagihan', $this->tglpenagihan)
@@ -808,7 +810,8 @@ class Index extends Component {
                 })
             ],
             'tglpenagihan' => [
-                'required', 'date',
+                'required',
+                'date',
                 function ($attribute, $value, $fail) {
                     if (strtotime($value) < strtotime($this->tgljual)) {
                         $fail('Tanggal penagihan harus lebih besar atau sama dengan tanggal jual.');
@@ -860,7 +863,8 @@ class Index extends Component {
 
         $rules = [
             'tglpenagihan' => [
-                'required', 'date',
+                'required',
+                'date',
                 function ($attribute, $value, $fail) {
                     if (strtotime($value) < strtotime($this->tgljual)) {
                         $fail('Tanggal penagihan harus lebih besar atau sama dengan tanggal jual.');
@@ -880,7 +884,9 @@ class Index extends Component {
 
         if ($this->tglpenagihan != $data->tglpenagihan) {
             $rules['nota'] = [
-                'required', 'min:15', 'max:15',
+                'required',
+                'min:15',
+                'max:15',
                 Rule::unique('penagihans')->where(function ($query) {
                     return $query->where('nota', $this->nota)
                         ->where('tglpenagihan', $this->tglpenagihan)
@@ -921,7 +927,7 @@ class Index extends Component {
 
         return view('livewire.main.penagihan.index', [
             'dbKartus' => $this->dbKartuPiutang,
-        ])->layout('layouts.app-layout', [
+        ])->layout('layouts.kai-layout', [
             'menu' => 'navmenu.main',
             'title' => $this->title,
         ]);

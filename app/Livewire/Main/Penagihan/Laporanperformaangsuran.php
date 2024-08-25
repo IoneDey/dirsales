@@ -99,7 +99,7 @@ class Laporanperformaangsuran extends Component {
 
         return view('livewire.main.penagihan.laporanperformaangsuran', [
             'dbPerformaAngsurans' => $this->dbPerformaAngsurans,
-        ])->layout('layouts.app-layout', [
+        ])->layout('layouts.kai-layout', [
             'menu' => 'navmenu.main',
             'title' => $this->title,
         ]);

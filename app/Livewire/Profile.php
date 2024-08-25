@@ -68,7 +68,7 @@ class Profile extends Component {
     public function render() {
         return view('livewire.profile', [
             'datas' => $this->data,
-        ])->layout('layouts.app-layout', [
+        ])->layout('layouts.kai-layout', [
             'menu' => 'navmenu.main',
             'title' => $this->title,
         ]);

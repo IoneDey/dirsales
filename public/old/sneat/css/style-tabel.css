@@ -1,0 +1,46 @@
+/* batasan heigh */
+.table-responsive {
+    max-height: 50vh;
+    overflow-y: auto;
+    overflow-x: auto;
+}
+
+/* Header tetap terlihat */
+thead th {
+    position: sticky;
+    top: 0;
+    background-color: #f8f9fa;
+    z-index: 10;
+    box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4);
+}
+
+/* Kolom pertama tetap terlihat */
+table td:first-child,
+table th:first-child {
+    position: sticky;
+    left: 0;
+    background-color: #f8f9fa;
+    z-index: 5;
+    box-shadow: 2px 0 2px -1px rgba(0, 0, 0, 0.4);
+}
+
+/* Tambahan khusus untuk area pertemuan */
+table th:first-child {
+    z-index: 15;
+}
+
+/* Tambahan khusus untu Header Tidak ikut scroll */
+thead th:not(:first-child) {
+    position: sticky;
+    top: 0;
+    background-color: #f8f9fa;
+    z-index: 9;
+}
+
+.rata-kanan {
+    text-align: right;
+}
+
+.rata-tengah {
+    text-align: center;
+}

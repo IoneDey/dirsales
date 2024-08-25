@@ -1,139 +1,171 @@
-<div id="layoutSidenav_nav">
-    <nav class="sb-sidenav accordion sb-sidenav-light" id="sidenavAccordion">
-        <div class="sb-sidenav-menu">
-            <div class="nav">
-                <div class="sb-sidenav-menu-heading">Main</div>
-                <a class="{{ Request::is('/') ? 'active' : '' }} nav-link" href="{{ route('main') }}">
-                    <div class="sb-nav-link-icon"><i class="fa-solid fa-house"></i></div>
-                    Home
-                </a>
+<div class="sidebar" data-background-color="white">
+    <div class="sidebar-logo">
+        <!-- Logo Header -->
+        <div class="logo-header" data-background-color="white">
+            <a href="#" class="logo">
+                <div class="input-group">
+                    <img
+                        src="{{ asset('img/logodsg.png') }}"
+                        alt="navbar brand"
+                        class="navbar-brand input-group-item"
+                        height="27" />
+                    <span class="input-label">
+                        <h5>&nbsp; <b>Direct Selling</b></h5>
+                    </span>
+                </div>
+            </a>
+            <div class="nav-toggle">
+                <button class="btn btn-toggle toggle-sidebar">
+                    <i class="gg-menu-right"></i>
+                </button>
+                <button class="btn btn-toggle sidenav-toggler">
+                    <i class="gg-menu-left"></i>
+                </button>
+            </div>
+            <button class="topbar-toggler more">
+                <i class="gg-more-vertical-alt"></i>
+            </button>
+        </div>
+        <!-- End Logo Header -->
+    </div>
 
-                <!-- menu pembelian -->
-                @if (in_array((auth()->user()->roles ?? ''), ['SUPERVISOR']))
-                <a class="nav-link" href="#">
-                    <div class="sb-nav-link-icon"><i class="fa-solid fa-shop"></i></div>
-                    Pembelian
-                </a>
-                @endif
+    <div class="sidebar-wrapper scrollbar scrollbar-inner">
+        <div class="sidebar-content">
+            <ul class="nav nav-secondary">
+                <li class="nav-item {{ Request::is('main') ? 'active' : '' }}">
+                    <a href="{{ route('main') }}">
+                        <i class="fas fa-home"></i>
+                        <p>Home</p>
+                    </a>
+                </li>
 
-                <!-- menu penjualan -->
                 @if (in_array((auth()->user()->roles ?? ''), ['SUPERVISOR','SPV ADMIN','ADMIN 2','LOCK','CHECKER']))
                 @php
-                $isActivePenjualan = Request::is('main/penjualan') || Request::is('main/penjualanret') || Request::is('main/penjualanvalidasi') || Request::is('main/penjualanreport') || Request::is('main/returpenjualanreport');
+                $isActivePenjualan = Request::is('main/penjualan') || Request::is('main/penjualanret') || Request::is('main/penjualanvalidasi') || Request::is('main/penjualanreturvalidasi') || Request::is('main/penjualanreport') || Request::is('main/returpenjualanreport');
                 @endphp
-                <a class="{{ $isActivePenjualan ? 'active' : '' }} nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayoutsPenjualan" aria-expanded="false" aria-controls="collapseLayoutsPenjualan">
-                    <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
-                    Penjualan
-                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                </a>
-                <!-- menu item penjualan -->
-                <div class="collapse" id="collapseLayoutsPenjualan" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
-                    <nav class="sb-sidenav-menu-nested nav">
-                        @if (in_array((auth()->user()->roles ?? ''), ['SUPERVISOR','SPV ADMIN','ADMIN 2']))
-                        <a class="{{ Request::is('main/penjualan') ? 'active' : '' }} nav-link" href="{{ route('penjualan') }}">Entry Penjualan</a>
-                        <a class="{{ Request::is('main/penjualanret') ? 'active' : '' }} nav-link" href="{{ route('penjualanret') }}">Entry Retur Penjualan</a>
-                        @endif
-                        @if (in_array((auth()->user()->roles ?? ''), ['SUPERVISOR','SPV ADMIN','LOCK']))
-                        <a class="{{ Request::is('main/penjualanvalidasi') ? 'active' : '' }} nav-link" href="{{ route('penjualanvalidasi') }}">Validasi Penjualan</a>
-                        @endif
+                <li class="nav-item {{ $isActivePenjualan ? 'active' : '' }}">
+                    <a
+                        data-bs-toggle="collapse"
+                        href="#penjualan"
+                        class="collapsed"
+                        aria-expanded="false">
+                        <i class="fas fa-money-check-alt"></i>
+                        <p>Penjualan</p>
+                        <span class="caret"></span>
+                    </a>
+                    <div class="collapse" id="penjualan">
+                        <ul class="nav nav-collapse">
+                            @if (in_array((auth()->user()->roles ?? ''), ['SUPERVISOR','SPV ADMIN','ADMIN 2']))
+                            <li class="{{ Request::is('main/penjualan') ? 'active' : '' }}">
+                                <a href="{{ route('penjualan') }}"><span class="sub-item">Entry Penjualan</span></a>
+                            </li>
+                            <li class="{{ Request::is('main/penjualanret') ? 'active' : '' }}">
+                                <a href="{{ route('penjualanret') }}"><span class="sub-item">Entry Retur Penjualan</span></a>
+                            </li>
+                            @endif
 
-                        @if (in_array((auth()->user()->roles ?? ''), ['SUPERVISOR','SPV ADMIN','ADMIN 2','LOCK']))
-                        <hr>
-                        @endif
+                            @if (in_array((auth()->user()->roles ?? ''), ['SUPERVISOR','SPV ADMIN','LOCK']))
+                            <li class="{{ Request::is('main/penjualanvalidasi') ? 'active' : '' }}">
+                                <a href="{{ route('penjualanvalidasi') }}"><span class="sub-item">Validasi Penjualan</span></a>
+                            </li>
+                            <li class="{{ Request::is('main/penjualanreturvalidasi') ? 'active' : '' }}">
+                                <a href="{{ route('penjualanreturvalidasi') }}"><span class="sub-item">Validasi Retur Penjualan</span></a>
+                            </li>
+                            @endif
 
-                        @if (in_array((auth()->user()->roles ?? ''), ['SUPERVISOR','SPV ADMIN','ADMIN 2','LOCK','CHECKER']))
-                        <a class="{{ Request::is('main/penjualanreport') ? 'active' : '' }} nav-link" href="{{ route('penjualanreport') }}">Laporan Penjualan</a>
-                        @endif
-                        @if (in_array((auth()->user()->roles ?? ''), ['SUPERVISOR','SPV ADMIN','ADMIN 2','CHECKER']))
-                        <a class="{{ Request::is('main/returpenjualanreport') ? 'active' : '' }} nav-link" href="{{ route('returpenjualanreport') }}">Laporan Retur Penjualan</a>
-                        @endif
-                    </nav>
-                </div>
+                            @if (in_array((auth()->user()->roles ?? ''), ['SUPERVISOR','SPV ADMIN','ADMIN 2','LOCK']))
+                            <li>
+                                <hr style="color:black;">
+                            </li>
+                            @endif
+
+                            @if (in_array((auth()->user()->roles ?? ''), ['SUPERVISOR','SPV ADMIN','ADMIN 2','LOCK','CHECKER']))
+                            <li class="{{ Request::is('main/penjualanreport') ? 'active' : '' }}">
+                                <a href="{{ route('penjualanreport') }}"><span class="sub-item">Laporan Penjualan</span></a>
+                            </li>
+                            @endif
+
+                            @if (in_array((auth()->user()->roles ?? ''), ['SUPERVISOR','SPV ADMIN','ADMIN 2','CHECKER']))
+                            <li class="{{ Request::is('main/returpenjualanreport') ? 'active' : '' }}">
+                                <a href="{{ route('returpenjualanreport') }}"><span class="sub-item">Laporan Retur Penjualan</span></a>
+                            </li>
+                            @endif
+                        </ul>
+                    </div>
+                </li>
                 @endif
 
-                <!-- menu penagihan -->
+                <!-- <li class="nav-section">
+                    <span class="sidebar-mini-icon">
+                        <i class="fa fa-ellipsis-h"></i>
+                    </span>
+                    <h4 class="text-section">Components</h4>
+                </li> -->
+
                 @if (in_array((auth()->user()->roles ?? ''), ['SUPERVISOR','PENAGIHAN','SPV ADMIN','ADMIN 2','CHECKER']))
                 @php
                 $isActivePenagihan = Request::is('main/penagihan/*') || Request::is('main/penagihanreport') || Request::is('main/penagihanreportnota') || Request::is('main/penagihanreporttim') || Request::is('main/penagihanreportperformaangsuran') || Request::is('main/penagihandraftspk') || Request::is('main/penagihanreschedule');
                 @endphp
-                <a class="{{ $isActivePenagihan ? 'active' : '' }} nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayoutsPenagihan" aria-expanded="false" aria-controls="collapseLayoutsPenagihan">
-                    <div class="sb-nav-link-icon"><i class="fa-solid fa-file-invoice"></i></div> Penagihan
-                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                </a>
+                <li class="nav-item {{ $isActivePenagihan ? 'active' : '' }}">
+                    <a data-bs-toggle="collapse" href="#penagihan">
+                        <i class="fas fa-layer-group"></i>
+                        <p>Penagihan</p>
+                        <span class="caret"></span>
+                    </a>
+                    <div class="collapse" id="penagihan">
+                        <ul class="nav nav-collapse">
+                            @if (in_array((auth()->user()->roles ?? ''), ['SUPERVISOR','PENAGIHAN','SPV ADMIN','ADMIN 2']))
+                            <li class="{{ Request::is('main/penagihan/*') ? 'active' : '' }}">
+                                <a href="{{ route('penagihan',['id' => 0]) }}">
+                                    <span class="sub-item">Entry Penagihan</span>
+                                </a>
+                            </li>
+                            @endif
+
+                            @if (in_array((auth()->user()->roles ?? ''), ['SUPERVISOR']))
+                            <li class="{{ Request::is('main/penagihanreschedule') ? 'active' : '' }}">
+                                <a href="{{ route('penagihanreschedule') }}">
+                                    <span class="sub-item">Reschedule Angsuran</span>
+                                </a>
+                            </li>
+                            @endif
+
+                            <li>
+                                <hr style="color:black;">
+                            </li>
+
+                            @if (in_array((auth()->user()->roles ?? ''), ['SUPERVISOR','PENAGIHAN','SPV ADMIN','ADMIN 2','CHECKER']))
+                            <li class="{{ Request::is('main/penagihanreport') ? 'active' : '' }}">
+                                <a href="{{ route('penagihanreport') }}">
+                                    <span class="sub-item">Laporan Penagihan</span>
+                                </a>
+                            </li>
+                            <li class="{{ Request::is('main/penagihanreportnota') ? 'active' : '' }}">
+                                <a href="{{ route('penagihanreportnota') }}">
+                                    <span class="sub-item">Laporan Rekap Sisa Penagihan/Nota</span>
+                                </a>
+                            </li>
+                            <li class="{{ Request::is('main/penagihanreportperformaangsuran') ? 'active' : '' }}">
+                                <a href="{{ route('penagihanreportperformaangsuran') }}">
+                                    <span class="sub-item">Laporan Performa Angsuran</span>
+                                </a>
+                            </li>
+                            <li class="{{ Request::is('main/penagihanreporttim') ? 'active' : '' }}">
+                                <a href="{{ route('penagihanreporttim') }}">
+                                    <span class="sub-item">Laporan Rekap Penagihan/Tim</span>
+                                </a>
+                            </li>
+                            <li class="{{ Request::is('main/penagihandraftspk') ? 'active' : '' }}">
+                                <a href="{{ route('draftspk') }}">
+                                    <span class="sub-item">Draft SPK</span>
+                                </a>
+                            </li>
+                            @endif
+                        </ul>
+                    </div>
+                </li>
                 @endif
-                <!-- menu item penagihan -->
-                <div class="collapse" id="collapseLayoutsPenagihan" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
-                    <nav class="sb-sidenav-menu-nested nav">
-                        @if (in_array((auth()->user()->roles ?? ''), ['SUPERVISOR','PENAGIHAN','SPV ADMIN','ADMIN 2']))
-                        <a class="{{ Request::is('main/penagihan/*') ? 'active' : '' }} nav-link" href="{{ route('penagihan',['id' => 0]) }}">Entry Penagihan</a>
-                        @endif
-
-                        @if (in_array((auth()->user()->roles ?? ''), ['SUPERVISOR']))
-                        <a class="{{ Request::is('main/penagihanreschedule') ? 'active' : '' }} nav-link" href="{{ route('penagihanreschedule') }}">Reschedule Angsuran</a>
-                        @endif
-
-                        @if (in_array((auth()->user()->roles ?? ''), ['SUPERVISOR','PENAGIHAN','SPV ADMIN','ADMIN 2','CHECKER']))
-                        <a class="{{ Request::is('main/penagihanreport') ? 'active' : '' }} nav-link" href="{{ route('penagihanreport') }}">Laporan Penagihan</a>
-                        <a class="{{ Request::is('main/penagihanreportnota') ? 'active' : '' }} nav-link" href="{{ route('penagihanreportnota') }}">Laporan Rekap Sisa Penagihan/Nota</a>
-                        <a class="{{ Request::is('main/penagihanreportperformaangsuran') ? 'active' : '' }} nav-link" href="{{ route('penagihanreportperformaangsuran') }}">Laporan Performa Angsuran</a>
-                        <a class="{{ Request::is('main/penagihanreporttim') ? 'active' : '' }} nav-link" href="{{ route('penagihanreporttim') }}">Laporan Rekap Penagihan/Tim</a>
-                        @endif
-                        @if (in_array((auth()->user()->roles ?? ''), ['SUPERVISOR','PENAGIHAN','SPV ADMIN','CHECKER']))
-                        <a class="{{ Request::is('main/penagihandraftspk') ? 'active' : '' }} nav-link" href="{{ route('draftspk') }}">Draft SPK</a>
-                        @endif
-
-                    </nav>
-                </div>
-
-                @if (in_array((auth()->user()->roles ?? ''), ['SUPERVISOR']))
-                <a class="nav-link" href="#">
-                    <div class="sb-nav-link-icon"><i class="fa-solid fa-sack-dollar"></i></div>
-                    Pembayaran
-                </a>
-                @endif
-
-                <!-- menu dashboard -->
-                @if (in_array((auth()->user()->roles ?? ''), ['SUPERVISOR','SPV ADMIN','CHECKER']))
-                @php
-                $isActiveDashboard = Request::is('main/penjualandashboard');
-                @endphp
-                <a class="{{ $isActiveDashboard ? 'active' : '' }} nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayoutsDashboard" aria-expanded="false" aria-controls="collapseLayoutsDashboard">
-                    <div class="sb-nav-link-icon"><i class="bi bi-speedometer2"></i></div> Dashboard
-                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                </a>
-                @endif
-                <!-- menu item dashboard -->
-                <div class="collapse" id="collapseLayoutsDashboard" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
-                    <nav class="sb-sidenav-menu-nested nav">
-                        @if (in_array((auth()->user()->roles ?? ''), ['SUPERVISOR','SPV ADMIN','CHECKER']))
-                        <a class="{{ Request::is('main/penjualandashboard') ? 'active' : '' }} nav-link" href="{{ route('penjualandashboard') }}">Penjualan</a>
-                        @endif
-                    </nav>
-                </div>
-
-                <!-- menu login -->
-                @auth
-                @else
-                <a class="{{ Request::is('login') ? 'active' : '' }} nav-link" href="{{ route('login') }}">
-                    <div class="sb-nav-link-icon"><i class="fa-solid fa-right-to-bracket"></i></div>
-                    Login
-                </a>
-                @endauth
-            </div>
+            </ul>
         </div>
-
-        <div class="sb-sidenav-footer">
-            <div class="nav small">Logged in as: {{ auth()->user()->roles ?? '' }}</div>
-            @auth
-            @if (auth()->user()->image)
-            <img src="{{ asset('storage/' . auth()->user()->image) }}" class="img-fluid rounded-circle" style="object-fit: cover; width: 25px; height: 25px;" alt="Profile Picture">
-            @else
-            <img src="{{ asset('img/profile-kosong.webp') }}" class="img-fluid rounded-circle" style="object-fit: cover; width: 25px; height: 25px;" alt="Profile Picture">
-            @endif
-            <a href="{{ route('profile') }}">{{ auth()->User()->name }}</a>
-            @else
-            Guest
-            @endauth
-        </div>
-    </nav>
+    </div>
 </div>

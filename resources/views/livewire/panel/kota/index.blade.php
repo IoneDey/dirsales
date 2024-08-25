@@ -1,7 +1,7 @@
 <div>
-    <link href="{{ asset('css/style_alert_center_close.css') }}" rel="stylesheet" />
-    <link href="{{ asset('css/styles_table_res.css') }}" rel="stylesheet" />
-    <link href="{{ asset('css/tabelsort.css') }}" rel="stylesheet" />
+    <link href="{{ asset('old/css/style_alert_center_close.css') }}" rel="stylesheet" />
+    <link href="{{ asset('old/css/styles_table_res.css') }}" rel="stylesheet" />
+    <link href="{{ asset('old/css/tabelsort.css') }}" rel="stylesheet" />
 
     <style>
         .custom-divider {

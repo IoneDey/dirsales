@@ -58,22 +58,36 @@ class Validasi extends Component {
     ];
 
     public function testSendWA() {
-        $countdata = $this->dbPenjualanhds->count();
-        $totalJual = $this->gTotalJual;
-        $imageUrl = "https://images.tokopedia.net/img/cache/215-square/GAnVPX/2022/6/14/dc496755-0535-4dc1-9403-374e77ecdc1d.jpg";
+        // $countdata = $this->dbPenjualanhds->count();
+        // $totalJual = $this->gTotalJual;
+        // $imageUrl = "https://images.tokopedia.net/img/cache/215-square/GAnVPX/2022/6/14/dc496755-0535-4dc1-9403-374e77ecdc1d.jpg";
 
         $message = <<<EOD
-            Halo,
-            Ini adalah pesan dari php.
-            ada $countdata data penjualan yg baru diselesaikan admin entry,
-            dengan total $totalJual.
-            Harap segera ditindak lanjuti, Terima kasih.
+            Selamat siang bu [nama koordinator],
+
+            Perkenalkan saya Admin surveyor dari [Risky/Gusti,Gandhi], kami ingin mengingatkan bahwa pembayaran untuk pesanan dengan nomor [no nota]. Dengan rincian sebagai berikut :
+
+            Jumlah Pembelian : [jumlah pembelian] pcs
+            Angsuran Ke : [Periode angsuran]
+            Tanggal Angsuran : [tgl angsuran]
+            Jumlah Tagihan : Rp.[jumlah angsuran]
+
+
+            Demikian informasi dari kami, *kami mohon untuk menyiapkan pembayaran sejumlah rincian tertera* yang selanjutnya petugas kami akan mengunjungi bu [nama koordinator] pada tanggal [tgl angsuran]
+            Silahkan tanggapi pesan ini dengan kata "Siap" jika ibu telah memahami pesan ini 😊
+
+
+            _"Setiap pembayaran tepat waktu adalah wujud dari tanggung jawab. Kita tidak hanya menjaga kepercayaan orang lain, tetapi juga memberikan kedamaian dan kelegaan untuk diri sendiri."_
             EOD;
-        //dd($message);
+        // ada $countdata data penjualan yg baru diselesaikan admin entry,
+        // dengan total $totalJual.
+        // Harap segera ditindak lanjuti, Terima kasih.
         $whatsAppController = new SendWaMessage();
-        //$response = $whatsAppController->sendMessage('6287701666286', $message);
-        $response = $whatsAppController->sendMessageWithImage('6287701666286', $imageUrl, 'Test Kirim Gambar', 'Logo Dinasty');
-        dump($response);
+        $response = $whatsAppController->sendMessage('6287701666286', $message);
+        $response = $whatsAppController->sendMessage('6282332601363', $message);
+        $response = $whatsAppController->sendMessage('6281362781385', $message);
+        // $response = $whatsAppController->sendMessageWithImage('6287701666286', $imageUrl, 'Test Kirim Gambar', 'Logo Dinasty');
+        $this->js('alert("Respose Kirim WA: ' . $response . '")');
     }
 
     public function resetErrors() {
@@ -251,7 +265,7 @@ class Validasi extends Component {
         return view('livewire.main.penjualan.validasi', [
             'penjualanhds' => $dbPenjualanhds,
             'grandTotal' => $gTotalJual,
-        ])->layout('layouts.app-layout', [
+        ])->layout('layouts.kai-layout', [
             'menu' => 'navmenu.main',
             'title' => $this->title,
         ]);

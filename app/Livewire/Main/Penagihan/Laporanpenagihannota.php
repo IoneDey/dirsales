@@ -115,7 +115,7 @@ class Laporanpenagihannota extends Component {
 
         return view('livewire.main.penagihan.laporanpenagihannota', [
             'salesData' => $salesData,
-        ])->layout('layouts.app-layout', [
+        ])->layout('layouts.kai-layout', [
             'menu' => 'navmenu.main',
             'title' => $this->title,
         ]);

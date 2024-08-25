@@ -99,20 +99,24 @@ class Laporanretur extends Component {
                         ->on('a.userid', '=', 'e.userid');
                 })
                 ->select(
+                    'a.timsetupid',
                     'a.tglretur',
                     'c.nama as tim',
                     'a.nota',
                     'd.customernama',
                     'a.noretur',
+                    DB::raw('SUM(if(a.harga>0,a.qty,0)) as qtyretur'),
                     DB::raw('SUM(a.qty * a.harga) as totalretur'),
-                    'e.foto'
+                    'e.foto',
+                    DB::raw('SUM(if(a.harga>0,a.qtyvalid,0)) as qtyvalid'),
+                    'e.fotovalid'
                 )
                 ->whereBetween('tglretur', [$startDate, $endDate])
                 ->where(function ($query) {
                     $query->where('a.nota', 'like', '%' . $this->cari . '%')
                         ->orWhere('d.customernama', 'like', '%' . $this->cari . '%');
                 })
-                ->groupBy('a.tglretur', 'c.nama', 'a.nota', 'd.customernama', 'a.noretur', 'e.foto');
+                ->groupBy('a.timsetupid', 'a.tglretur', 'c.nama', 'a.nota', 'd.customernama', 'a.noretur', 'e.foto', 'e.fotovalid');
         }
 
         if ($this->JenisRpt == 'DETAIL') {
@@ -131,6 +135,7 @@ class Laporanretur extends Component {
                         ->on('a.nota', '=', 'g.nota');
                 })
                 ->select(
+                    'a.timsetupid',
                     'c.nama as tim',
                     'a.tglretur',
                     'a.noretur',
@@ -138,6 +143,7 @@ class Laporanretur extends Component {
                     'g.customernama',
                     'f.nama as namabarang',
                     'a.qty as qtyretur',
+                    'a.qtyvalid as qtyvalid',
                     'a.harga as hargaretur',
                     DB::raw('a.qty * a.harga as totalretur')
                 )
@@ -211,7 +217,9 @@ class Laporanretur extends Component {
                 'a.qty as qtyretur',
                 'a.harga as hargaretur',
                 DB::raw('a.qty * a.harga as totalretur'),
-                DB::raw("CONCAT('" . asset('storage/') . "/',h.foto) as foto")
+                DB::raw("CONCAT('" . asset('storage/') . "/',h.foto) as foto"),
+                'a.tglvalid',
+                'a.qtyvalid',
             )
             ->whereBetween('tglretur', [$startDate, $endDate])
             ->where(function ($query) {
@@ -232,7 +240,7 @@ class Laporanretur extends Component {
 
         return view('livewire.main.penjualan.laporanretur', [
             'penjualanreturs' => $penjualanreturs,
-        ])->layout('layouts.app-layout', [
+        ])->layout('layouts.kai-layout', [
             'menu' => 'navmenu.main',
             'title' => $this->title,
         ]);

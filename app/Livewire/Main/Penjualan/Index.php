@@ -64,6 +64,7 @@ class Index extends Component {
     //db
     public $dbTimsetups;
     public $dbSales;
+    public $dbSurveyors;
     public $dbDrivers;
     public $dbKolektors;
 
@@ -72,6 +73,7 @@ class Index extends Component {
     public $setisifotonota = true;
     public $setisifotonotarekap = true;
 
+
     public function resetErrors() {
         $this->resetErrorBag();
     }
@@ -79,8 +81,10 @@ class Index extends Component {
     public function mount() {
         $this->dbTimsetups = Timsetup::get();
         $this->dbDrivers = DB::select("SELECT nama FROM `karyawans` where void=0 and flagdriver=1");
+        $this->dbSurveyors = DB::select("SELECT nama FROM `karyawans` where void=0 and flagsurveyor=1");
         $this->dbKolektors = DB::select("SELECT nama FROM `karyawans` where void=0 and flagkolektor=1");
     }
+
 
     public function entryNew() {
         $this->resetErrors();
@@ -88,6 +92,14 @@ class Index extends Component {
         $this->clearPaket();
         $this->isEditor = true;
         $this->isUpdate = false;
+    }
+
+    public function test() {
+        // $this->resetErrors();
+        // $this->clear();
+        // $this->clearPaket();
+        //$this->isEditor = true;
+        //$this->isUpdate = false;
     }
 
     private function formatNota($value) {
@@ -148,7 +160,9 @@ class Index extends Component {
         $rules = [
             'timsetupid' => 'required',
             'nota' => [
-                'required', 'min:15', 'max:15',
+                'required',
+                'min:15',
+                'max:15',
                 Rule::unique('penjualanhds')->where(function ($query) {
                     return $query->where('nota', $this->nota)
                         ->where('timsetupid', $this->timsetupid);
@@ -245,7 +259,9 @@ class Index extends Component {
 
             if ($this->nota != $data->nota) {
                 $rules['nota'] = [
-                    'required', 'min:15', 'max:15',
+                    'required',
+                    'min:15',
+                    'max:15',
                     Rule::unique('penjualanhds')->where(function ($query) {
                         return $query->where('nota', $this->nota)
                             ->where('timsetupid', $this->timsetupid);
@@ -587,7 +603,8 @@ class Index extends Component {
             'dbTimssetuppakets' => $dbTimssetuppakets,
             'dbPenjualandts' => $dbPenjualandts,
             'dbSaless' => $this->dbSales,
-        ])->layout('layouts.app-layout', [
+            'dbSurveyorss' => $this->dbSurveyors,
+        ])->layout('layouts.kai-layout', [
             'menu' => 'navmenu.main',
             'title' => $this->title,
         ]);

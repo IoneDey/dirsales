@@ -49,7 +49,7 @@ class Penjualanrekap implements FromCollection, WithHeadings {
             'PJ Kurir Asisten',
             'Tgl Akad',
             'Foto Akad',
-            'Catatan'
+            'Catatan',
         ];
     }
 

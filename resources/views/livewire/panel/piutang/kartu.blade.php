@@ -1,5 +1,5 @@
 <div>
-    <link href="{{ asset('css/styles_table_res.css') }}" rel="stylesheet" />
+    <link href="{{ asset('old/css/styles_table_res.css') }}" rel="stylesheet" />
     <style>
         @media (max-width: 768px) {
             .input-group-item {

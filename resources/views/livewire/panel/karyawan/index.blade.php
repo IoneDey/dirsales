@@ -1,9 +1,9 @@
 <div>
     {{-- Knowing others is intelligence; knowing yourself is true wisdom. --}}
-    <link href="{{ asset('css/style_alert_center_close.css') }}" rel="stylesheet" />
-    <link href="{{ asset('css/styles_table_res.css') }}" rel="stylesheet" />
-    <link href="{{ asset('css/tabelsort.css') }}" rel="stylesheet" />
-    <link href="{{ asset('css/styleSelect2.css') }}" rel="stylesheet" />
+    <link href="{{ asset('old/css/style_alert_center_close.css') }}" rel="stylesheet" />
+    <link href="{{ asset('old/css/styles_table_res.css') }}" rel="stylesheet" />
+    <link href="{{ asset('old/css/tabelsort.css') }}" rel="stylesheet" />
+    <link href="{{ asset('old/css/styleSelect2.css') }}" rel="stylesheet" />
 
     <style>
         .custom-divider {
@@ -80,6 +80,11 @@
                                 @error('flagkolektor')
                                 <span style="font-size: smaller; color: red;">{{ $message }}</span>
                                 @enderror
+                                <input class="form-check-input" wire:model="flagsurveyor" type="checkbox" value="false" id="flagsurveyor" placeholder="" name="flagsurveyor">
+                                <span class="input-label">Surveyor</span>
+                                @error('flagsurveyor')
+                                <span style="font-size: smaller; color: red;">{{ $message }}</span>
+                                @enderror
                             </div>
                         </div>
                         <div class="col-6 g-1">
@@ -113,6 +118,7 @@
                             <th class="sort @if ($sortColumn=='notelp') {{ $sortDirection }} @endif" wire:click="sort('notelp')">No. Telp</th>
                             <th class="rata-tengah sort @if ($sortColumn=='flagdriver') {{ $sortDirection }} @endif" wire:click="sort('flagdriver')">Driver</th>
                             <th class="rata-tengah sort @if ($sortColumn=='flagkolektor') {{ $sortDirection }} @endif" wire:click="sort('flagkolektor')">Kurir</th>
+                            <th class="rata-tengah sort @if ($sortColumn=='flagsurveyor') {{ $sortDirection }} @endif" wire:click="sort('flagsurveyor')">Surveyor</th>
                             <th>Act</th>
                         </tr>
                     </thead>
@@ -125,6 +131,7 @@
                             <td>{{ $dbdata->notelp }}</td>
                             <td class="rata-tengah"><input type="checkbox" disabled {{ $dbdata->flagdriver ? 'checked' : '' }}></td>
                             <td class="rata-tengah"><input type="checkbox" disabled {{ $dbdata->flagkolektor ? 'checked' : '' }}></td>
+                            <td class="rata-tengah"><input type="checkbox" disabled {{ $dbdata->flagsurveyor ? 'checked' : '' }}></td>
                             <td>
                                 <a wire:click="edit({{ $dbdata->id }})" wire:loading.attr="disabled" type="button" class="badge bg-warning bg-sm" href="#top"><i class="bi bi-pencil-fill"></i></a>
                                 <a wire:click="confirmDelete({{ $dbdata->id }})" wire:loading.attr="disabled" class="badge bg-danger bg-sm" data-bs-toggle="modal" data-bs-target="#ModalDelete"><i class="bi bi-eraser"></i></a>
@@ -136,7 +143,6 @@
                 {{ $datas->links() }}
             </div>
         </div>
-
 
         <!-- untuk modal confirm delete -->
         <div wire:ignore.self class="modal fade" id="ModalDelete" tabindex="-1" aria-labelledby="ModalDeleteLabel" aria-hidden="true">

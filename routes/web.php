@@ -26,7 +26,10 @@ Route::middleware(['checkroles:SUPERVISOR'])->group(function () {
     Route::get('/panel/timsetup', App\Livewire\Panel\Timsetup\Index::class)->name('timsetup');
     Route::get('/panel/piutangkartu', App\Livewire\Panel\Piutang\Kartu::class)->name('piutangkartu');
 
-    //Route::get('/main/penjualan', App\Livewire\Main\Penjualan\Index::class)->name('penjualan');
+    Route::get('/panel/utility/sendwatagihan', App\Livewire\Panel\Utility\Sendwatagihan::class)->name('sendwatagihan');
+
+
+    //Route::get('/main/penjualan', app\Livewire\Main\Penjualan\Index::class)->name('penjualan');
 });
 
 // entry penjualan dan retur
@@ -35,10 +38,11 @@ Route::middleware(['checkroles:SUPERVISOR,SPV ADMIN,ADMIN 2'])->group(function (
     Route::get('/main/penjualanret', App\Livewire\Main\Penjualan\Retur::class)->name('penjualanret');
 });
 
-// penjualan validasi
+// penjualan validasi dan retur validasi
 Route::middleware(['checkroles:SUPERVISOR,SPV ADMIN,LOCK'])->group(function () {
     Route::get('/main/penjualanvalidasi', App\Livewire\Main\Penjualan\Validasi::class)->name('penjualanvalidasi');
     Route::get('/main/penjualanvalidasiedit/{id}', App\Livewire\Main\Penjualan\Validasiedit::class)->name('penjualanvalidasiedit');
+    Route::get('/main/penjualanreturvalidasi', App\Livewire\Main\Penjualan\Validasiretur::class)->name('penjualanreturvalidasi');
 });
 
 // laporan penjualan
@@ -59,7 +63,7 @@ Route::middleware(['checkroles:SUPERVISOR,SPV ADMIN,ADMIN 2,CHECKER'])->group(fu
 
 // penagihan
 Route::middleware(['checkroles:SUPERVISOR,PENAGIHAN,SPV ADMIN,ADMIN 2'])->group(function () {
-    Route::get('/main/penagihan/{id}', App\Livewire\Main\Penagihan\index::class)->name('penagihan');
+    Route::get('/main/penagihan/{id}', App\Livewire\Main\Penagihan\Index::class)->name('penagihan');
 });
 
 // penagihan reschedule angsuran
@@ -69,20 +73,20 @@ Route::middleware(['checkroles:SUPERVISOR'])->group(function () {
 
 // draft spk
 Route::middleware(['checkroles:SUPERVISOR,PENAGIHAN,SPV ADMIN,CHECKER'])->group(function () {
-    Route::get('/main/penagihandraftspk', App\Livewire\Main\Penagihan\draftspk::class)->name('draftspk');
+    Route::get('/main/penagihandraftspk', App\Livewire\Main\Penagihan\Draftspk::class)->name('draftspk');
 });
 
 // laporan penagihan
 Route::middleware(['checkroles:SUPERVISOR,PENAGIHAN,SPV ADMIN,ADMIN 2,CHECKER'])->group(function () {
-    Route::get('/main/penagihanreport', App\Livewire\Main\Penagihan\laporan::class)->name('penagihanreport');
-    Route::get('/main/penagihanreportnota', App\Livewire\Main\Penagihan\laporanpenagihannota::class)->name('penagihanreportnota');
-    Route::get('/main/penagihanreportperformaangsuran', App\Livewire\Main\Penagihan\laporanperformaangsuran::class)->name('penagihanreportperformaangsuran');
-    Route::get('/main/penagihanreporttim', App\Livewire\Main\Penagihan\laporanpenagihantim::class)->name('penagihanreporttim');
+    Route::get('/main/penagihanreport', App\Livewire\Main\Penagihan\Laporan::class)->name('penagihanreport');
+    Route::get('/main/penagihanreportnota', App\Livewire\Main\Penagihan\Laporanpenagihannota::class)->name('penagihanreportnota');
+    Route::get('/main/penagihanreportperformaangsuran', App\Livewire\Main\Penagihan\Laporanperformaangsuran::class)->name('penagihanreportperformaangsuran');
+    Route::get('/main/penagihanreporttim', App\Livewire\Main\Penagihan\Laporanpenagihantim::class)->name('penagihanreporttim');
 });
 
 // dashboard
 Route::middleware(['checkroles:SUPERVISOR,SPV ADMIN,CHECKER'])->group(function () {
-    Route::get('/main/penjualandashboard', App\Livewire\Main\Dashboard\penjualan::class)->name('penjualandashboard');
+    Route::get('/main/penjualandashboard', App\Livewire\Main\Dashboard\Penjualan::class)->name('penjualandashboard');
 });
 
 route::middleware('auth')->group(function () {
@@ -90,5 +94,6 @@ route::middleware('auth')->group(function () {
     Route::get('/logout', [App\Livewire\Logout::class, 'logout'])->name('logout');
 });
 
-Route::get('/login', App\Livewire\Login::class)->name('login')->middleware('guest');
-Route::get('/', App\Livewire\Main\Index::class)->name('main');
+// Route::get('/login', App\Livewire\Login::class)->name('login');
+Route::get('/main', App\Livewire\Main\Index::class)->name('main')->middleware('auth');
+Route::get('/', App\Livewire\Welcome::class)->name('welcome')->middleware('guest');
